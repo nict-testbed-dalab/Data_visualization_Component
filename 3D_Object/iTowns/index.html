@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>iTowns sample</title>
+    <!--script type="text/javascript" src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script-->
+    <script type="text/javascript" src="js/jquery-3.6.0.min.js"></script>
+    <script type="text/javascript" src="./timeline/1.8.0/jquery-k2go-timeline.js"></script>
+    <script type="text/javascript" src="js/lib/picker.js"></script>
+    <script type="text/javascript" src="js/lib/picker.date.js"></script>
+    <script type="text/javascript" src="js/lib/picker.date.lang.js"></script>
+    <script type="text/javascript" src="js/env.js"></script>
+    <script type="text/javascript" src="js/fnc.js"></script>
+    <script type="text/javascript" src="js/main.js"></script>
+    <script type="text/javascript" src="js/STARScontroller.js"></script>
+    <link type="text/css" href="./timeline/1.8.0/jquery-k2go-timeline.css" rel="stylesheet" />
+    <link type="text/css" href="css/index.css" rel="stylesheet" />
+    <link type="text/css" href="css/iframe.css" rel="stylesheet" />
+    <link type="text/css" href="css/style.css" rel="stylesheet" />
+    <link type="text/css" href="css/play_box.css" rel="stylesheet" />
+    <link type="text/css" href="css/default.css" rel="stylesheet" />
+    <link type="text/css" href="css/default.date.css" rel="stylesheet" />
+  </head>
+
+  <body>
+    <header>
+      <div id="head_top_bar">
+        <div class="left">
+          <span>Timeline</span>
+        </div>
+        <div class="center">
+          <span id="date_box">
+            <span id="cal"></span>
+            <span id="date">0000-00-00 00:00:00</span>
+            <span id="current_time" class="timeCurrent"></span>
+          </span>
+        </div>
+        <div class="right"></div>
+      </div>
+    </header>
+
+    <div id="function_bar">
+      <div class="left">
+        <a id="button_select_data">Select Data</a>
+        <a id="button_view_url">View URL</a>
+        <a id="button_help">HELP</a>
+      </div>
+      <div class="center">
+        <div id="play_box">
+          <a id="button_loop"></a>
+          <div id="play_ctl">
+            <a id="button_back_edge"></a>
+            <a id="button_back"></a>
+            <a id="button_play_reverse"><span></span></a>
+            <a id="button_stop"></a>
+            <a id="button_play"><span></span></a>
+            <a id="button_fwd"></a>
+            <a id="button_fwd_edge"></a>
+          </div>
+          <div id="blank"></div>
+        </div>
+      </div>
+      <div class="right">
+        <div id="slider_label">1 day</div>
+        <div id="slider">
+          <a id="button_minus"></a>
+          <input id="zoom-range" type="range" class="input-range" min="0" step="1" />
+          <a id="button_plus"></a>
+        </div>
+      </div>
+    </div>
+
+    <div id="main">
+      <div id="content">
+        <iframe src="./map/index.html" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" id="map"></iframe>
+      </div>
+    </div>
+
+    <footer>
+      <div id="button_range"><span>RangeBar</span></div>
+      <div id="timeline"></div>
+    </footer>
+    
+    <div id="view_url">
+      <div id="view_url_box">
+        <div class="view_url_box_header">
+          <div class="view_url_box_title">ViewURL</div>
+          <div class="view_url_box_close"></div>
+        </div>
+        <div class="view_url_box_body">
+          <div class="input_group">
+            <input type="text" value="" aria-label="" readonly="" id="view_url_input">
+            <div class="input_group_button"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="lockWindow"></div>
+    
+  </body>
+</html>

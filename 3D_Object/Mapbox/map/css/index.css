@@ -1,0 +1,52 @@
+/******************************************************************************/
+/* k2go STARScontroller                                                       */
+/* author    : Inoue Computer Service.                                        */
+/* copyright : k2go                                                           */
+/* version   : 1.0.0                                                          */
+/******************************************************************************/
+html, body, iframe { width:100%; height:100%; margin:0; padding:0; border:none; overflow:hidden; }
+
+#bargraph_controller {
+  position:relative;
+  width: 200px;
+  height: 60px;
+  top: 100px;
+  left: 100px;
+  background-color: white;
+}
+
+#bargraph_controller > div {
+  position:relative;
+  width: 212px;
+  height: 20px;
+}
+
+#bargraph_controller > div > #label {
+  position:relative;
+  width: 100px;
+  height: 20px;
+  border: 2px solid green;
+  background-color: #ddffdd;
+  float: left;
+}
+
+#bargraph_controller > div > #plus {
+  position:relative;
+  width: 50px;
+  height: 20px;
+  border: 2px solid green;
+  background-color: #ddffdd;
+  float: left;
+  text-align: center;
+}
+
+#bargraph_controller > div > #minus {
+  position:relative;
+  width: 50px;
+  height: 20px;
+  border: 2px solid green;
+  background-color: #ddffdd;
+  float: left;
+  text-align: center;
+}
+

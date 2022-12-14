@@ -1,0 +1,31 @@
+{
+  "type":"FeatureCollection",
+  "features":[
+    {
+      "type":"Feature",
+      "properties":{"name":"東京駅", "value":125},
+      "geometry":{"type":"Point", "coordinates":[139.7673068,35.6809591]}
+    },
+    {
+      "type":"Feature",
+      "properties":{"name":"新宿駅", "value":360},
+      "geometry":{"type":"Point", "coordinates":[139.70025799999996, 35.690921]}
+    },
+    {
+      "type":"Feature",
+      "properties":{"name":"渋谷駅", "value":320},
+      "geometry":{"type":"Point", "coordinates":[139.70133399999997, 35.658517]}
+    },
+    {
+      "type":"Feature",
+      "properties":{"name":"池袋駅", "value":263},
+      "geometry":{"type":"Point", "coordinates":[139.71038, 35.728926]}
+    },
+    {
+      "type":"Feature",
+      "properties":{"name":"品川駅", "value":107},
+      "geometry":{"type":"Point", "coordinates":[139.74044000000004, 35.630152]}
+    }
+  ]
+}
+

@@ -568,7 +568,11 @@ $("#button_single_capture").on("click", function(){
 $("#button_multi_capture").on("click", function() {
   $(this).toggleClass("active");
   let timeOpt = $("#timeline").k2goTimeline("getOptions");
-  multiCapture(timeOpt.currentTime, timeOpt.currentTime, new Date(timeOpt.currentTime.getTime() + 30 * 60 * 1000), 10 * 60 * 1000,
+  let startTime = timeOpt.currentTime;
+  let endTime = new Date(timeOpt.currentTime.getTime() + 30 * 60 * 1000);
+  let stepTime = 10 * 60 * 1000;
+
+  multiCapture(timeOpt.currentTime, startTime, endTime, stepTime,
       function(){
         return $("#button_multi_capture").hasClass("active");
       },
@@ -583,11 +587,15 @@ $("#button_multi_capture").on("click", function() {
             maxTime : timelineObj.maxTime,
           }
         });
+        if (cTime >= endTime) {
+          $("#button_multi_capture").removeClass("active");
+	}
       },
       function(cTime){
         return $("#timeline").k2goTimeline("formatDate", cTime, "%y%mm%dd%H%M%S.jpg");
       }
   );
+  //$(this).removeClass("active");
 });
 
 

@@ -5,7 +5,7 @@ wgapp.val = 1;
 wgapp.layerId = 'plane_group'
 
 $(function() {
-  mapboxgl.accessToken = "";
+  mapboxgl.accessToken = "pk.eyJ1IjoibXVyYW5hZ2EiLCJhIjoiY2wxMjU4ZjBnMDAwejNibXhrMmp6b3NweCJ9.o4JF8rJyfGYrodp6TaQROA";
   wgapp.map = new mapboxgl.Map({
     container: 'map', 
     style: {
@@ -31,46 +31,15 @@ $(function() {
   });
 
   wgapp.map.on('load', () => {
-    addPlaneGroupLayer(wgapp.map, wgapp.layerId, './data/sample.json');
+    addPlaneGroupLayer(wgapp.map, './data/sample.geojson', "value", wgapp.layerId);
   });
 
 });
 
-function addPlaneGroupLayer(map, layerId, filename){
-  d3.json(filename).then(function(data) {
-    planeGroupLayer = createPlaneGroupLayer(layerId, data);
-    map.addLayer(planeGroupLayer);
-  }).catch(function(error){
-    console.log(error);
-  });
-}
-
-function createPlaneGroupLayer(layerId, planeData){
-  const layer = new deck.MapboxLayer({
-    id: layerId,
-    type: deck.PolygonLayer,
-    data: planeData,
-    getPolygon: d => d.contour,
-    getElevation: d => 0,
-    getFillColor: d => convertColor(d.value),
-    getLineColor: [255, 0, 0],
-    opacity: 0.5,
-  });
-
-  return layer;
-}
-
-function updatePlaneGroupLayer(formatDt){
-  const layerId = wgapp.layerId;
-  if (wgapp.map.getLayer(layerId)) {
-    wgapp.map.removeLayer(layerId);
-  }
-  addPlaneGroupLayer(wgapp.map, layerId, './data/' + formatDt + '.json');
-}
-
-function convertColor(val){
-  let r = (parseInt(Math.min(val, 16 * 16* 16 - 1) / (16 * 16))) * 16;
-  let g = (parseInt(val / 16) % 16) * 16;
-  let b = (val % 16) * 16;
-  return [r, g, b];
+function updateLayers(pDate) {
+  let ct = new Date(Math.floor(pDate.currentTime / 3600000) * 3600000);
+  var formatDate = String(ct.getFullYear()).padStart(4, '0') + String(ct.getMonth() + 1).padStart(2, '0') + String(ct.getDate()).padStart(2, '0');
+  var formatTime = String(ct.getHours()).padStart(2, '0') + String(ct.getMinutes()).padStart(2, '0');
+  console.log("updateDate " + formatDate + " " + formatTime);
+  updatePlaneGroupLayer(wgapp.map, './data/' + formatDate + formatTime + '.geojson', "value", wgapp.layerId);
 }

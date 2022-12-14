@@ -31,38 +31,29 @@ $(function() {
   wgapp.bargraph = {};
   wgapp.bargraph.layerId = "bargraph_layer";
   wgapp.bargraph.sourceId = "bargraph_source";
-  wgapp.bargraph.currentData = "./data/test.csv";
-  wgapp.bargraph.radiusSize = 3;
+  wgapp.bargraph.currentData = "./data/sample.geojson";
+  wgapp.bargraph.radiusSize = 300;
   wgapp.bargraph.elevationScale = 50;
   wgapp.bargraph.colorIndex = 0;
   wgapp.bargraph.timestep = 3600000;
 
   wgapp.map.on('load', function() {
-    wgapp.map.addSource(wgapp.bargraph.sourceId, {
-      "type": "geojson",
-      "data": {
-        type: 'FeatureCollection',
-        features: []
-      }
-    });
-
-    wgapp.map.addLayer({
-      'id': wgapp.bargraph.layerId,
-      'type': 'fill-extrusion',
-      'source': wgapp.bargraph.sourceId,
-      'paint': {
-        'fill-extrusion-color': 'red',
-        'fill-extrusion-height': ['get', 'height'],
-        'fill-extrusion-base': ['get', 'base'],
-        'fill-extrusion-opacity': 0.6
-      }
-    });
-
     addBargraphController();
-    updateBargraphSource(wgapp.bargraph.currentData, wgapp.bargraph.sourceId, wgapp.bargraph.radiusSize, wgapp.bargraph.elevationScale);
+    addBargraphLayer(wgapp.map, wgapp.bargraph.currentData, "value", wgapp.bargraph.layerId, wgapp.bargraph.sourceId, "red", wgapp.bargraph.radiusSize, wgapp.bargraph.elevationScale);
   });
 
 });
+
+const colorList = ["red", "yellow", "green", "cyan", "blue", "pink"];
+
+function updateLayers(pDate){
+  let ct = new Date(Math.floor(pDate.currentTime / wgapp.bargraph.timestep) * wgapp.bargraph.timestep);
+  var formatDate = String(ct.getFullYear()).padStart(4, '0') + String(ct.getMonth() + 1).padStart(2, '0') + String(ct.getDate()).padStart(2, '0');
+  var formatTime = String(ct.getHours()).padStart(2, '0') + String(ct.getMinutes()).padStart(2, '0');
+  console.log("updateDate " + formatDate + " " + formatTime);
+  wgapp.bargraph.currentData = "./data/" + formatDate + formatTime + ".geojson";
+  updateBargraphLayer(wgapp.map, wgapp.bargraph.currentData, "value", wgapp.bargraph.layerId, wgapp.bargraph.sourceId, colorList[wgapp.bargraph.colorIndex], wgapp.bargraph.radiusSize, wgapp.bargraph.elevationScale);
+}
 
 function addBargraphController(){
   $('#map').append('<div id="bargraph_controller"></div>');
@@ -72,12 +63,12 @@ function addBargraphController(){
   $('#radius').append('<div id="plus">＋</div>');
   $('#radius').append('<div id="minus">－</div>');
   $('#radius > #plus').on('click', function () {
-    wgapp.bargraph.radiusSize += 2;
-    updateBargraphSource(wgapp.bargraph.currentData, wgapp.bargraph.sourceId, wgapp.bargraph.radiusSize, wgapp.bargraph.elevationScale);
+    wgapp.bargraph.radiusSize += 200;
+    updateBargraphLayer(wgapp.map, wgapp.bargraph.currentData, "value", wgapp.bargraph.layerId, wgapp.bargraph.sourceId, colorList[wgapp.bargraph.colorIndex], wgapp.bargraph.radiusSize, wgapp.bargraph.elevationScale);
   });
   $('#radius > #minus').on('click', function () {
-    wgapp.bargraph.radiusSize = Math.max(3, wgapp.bargraph.radiusSize - 2);
-    updateBargraphSource(wgapp.bargraph.currentData, wgapp.bargraph.sourceId, wgapp.bargraph.radiusSize, wgapp.bargraph.elevationScale);
+    wgapp.bargraph.radiusSize = Math.max(100, wgapp.bargraph.radiusSize - 200);
+    updateBargraphLayer(wgapp.map, wgapp.bargraph.currentData, "value", wgapp.bargraph.layerId, wgapp.bargraph.sourceId, colorList[wgapp.bargraph.colorIndex], wgapp.bargraph.radiusSize, wgapp.bargraph.elevationScale);
   });
 
   $('#bargraph_controller').append('<div id="elevation"></div>');
@@ -86,85 +77,24 @@ function addBargraphController(){
   $('#elevation').append('<div id="minus">－</div>');
   $('#elevation > #plus').on('click', function () {
     wgapp.bargraph.elevationScale += 5;
-    updateBargraphSource(wgapp.bargraph.currentData, wgapp.bargraph.sourceId, wgapp.bargraph.radiusSize, wgapp.bargraph.elevationScale);
+    updateBargraphLayer(wgapp.map, wgapp.bargraph.currentData, "value", wgapp.bargraph.layerId, wgapp.bargraph.sourceId, colorList[wgapp.bargraph.colorIndex], wgapp.bargraph.radiusSize, wgapp.bargraph.elevationScale);
   });
   $('#elevation > #minus').on('click', function () {
     wgapp.bargraph.elevationScale = Math.max(5, wgapp.bargraph.elevationScale - 5);
-    updateBargraphSource(wgapp.bargraph.currentData, wgapp.bargraph.sourceId, wgapp.bargraph.radiusSize, wgapp.bargraph.elevationScale);
+    updateBargraphLayer(wgapp.map, wgapp.bargraph.currentData, "value", wgapp.bargraph.layerId, wgapp.bargraph.sourceId, colorList[wgapp.bargraph.colorIndex], wgapp.bargraph.radiusSize, wgapp.bargraph.elevationScale);
   });
 
-  const colorList = ["red", "yellow", "green", "cyan", "blue", "pink"];
   $('#bargraph_controller').append('<div id="color"></div>');
   $('#color').append('<div id="label">color</div>');
   $('#color').append('<div id="plus">＋</div>');
   $('#color').append('<div id="minus">－</div>');
   $('#color > #plus').on('click', function () {
     wgapp.bargraph.colorIndex = (wgapp.bargraph.colorIndex + 1) % 6;
-    wgapp.map.setPaintProperty(wgapp.bargraph.layerId, 'fill-extrusion-color', colorList[wgapp.bargraph.colorIndex]);
+    updateBargraphLayer(wgapp.map, wgapp.bargraph.currentData, "value", wgapp.bargraph.layerId, wgapp.bargraph.sourceId, colorList[wgapp.bargraph.colorIndex], wgapp.bargraph.radiusSize, wgapp.bargraph.elevationScale);
   });
   $('#color > #minus').on('click', function () {
     wgapp.bargraph.colorIndex = (wgapp.bargraph.colorIndex + 5) % 6;
-    wgapp.map.setPaintProperty(wgapp.bargraph.layerId, 'fill-extrusion-color', colorList[wgapp.bargraph.colorIndex]);
+    updateBargraphLayer(wgapp.map, wgapp.bargraph.currentData, "value", wgapp.bargraph.layerId, wgapp.bargraph.sourceId, colorList[wgapp.bargraph.colorIndex], wgapp.bargraph.radiusSize, wgapp.bargraph.elevationScale);
   });
 }
 
-function updateBargraphSource(filename, layerId, radiusSize, elevationScale){
-  d3.csv(filename).then(function(csvdata) {
-    let data = {
-      "type": "FeatureCollection",
-      "features": csvdata.map(function(d) {
-        return {
-          type: "Feature",
-          properties: { name: d.name, value: parseFloat(d.val) },
-          geometry: {
-            type: "Point",
-            coordinates: [parseFloat(d.lng), parseFloat(d.lat)]
-          }
-        }
-      })
-    };
-    wgapp.map.getSource(layerId).setData(createSourceData(data, radiusSize, elevationScale));
-    wgapp.map.setLayoutProperty(wgapp.bargraph.layerId, 'visibility', 'visible');
-  }).catch(function(error){
-    console.log(error);
-    console.log("error : readCsv " + filename);
-    if (wgapp.map.getLayer(wgapp.bargraph.layerId)) {
-      wgapp.map.setLayoutProperty(wgapp.bargraph.layerId, 'visibility', 'none');
-    }
-  });
-}
-
-function createSourceData(geojsonData, radiusSize, elevationScale){
-  let data = {
-    "type": "FeatureCollection",
-    "features": []
-  };
-
-  geojsonData.features.forEach(function (object, i) {
-
-    const point = object.geometry.coordinates
-
-    let xy = wgapp.map.project(point);
-    let lnglat = wgapp.map.unproject({x: xy.x += radiusSize, y: xy.y});
-    lnglat = turf.point([lnglat.lng, lnglat.lat]);
-
-    const radius = turf.distance(point, lnglat, {units: 'meters'});
-
-    object.properties.height = object.properties.value * elevationScale;
-    object.properties.base = 0;
-    object.properties.index = i;
-
-    const options = {
-      steps: 4,
-      units: 'meters',
-      properties: object.properties
-    };
-
-    const feature = turf.circle(point, radius, options);
-    feature.id = i;
-
-    data.features.push(feature);
-  });
-
-  return data;
-}

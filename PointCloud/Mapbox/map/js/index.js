@@ -3,7 +3,7 @@ let wgapp = {};
 wgapp.val = 1;
 
 $(function() {
-  mapboxgl.accessToken = "";
+  mapboxgl.accessToken = "pk.eyJ1IjoibXVyYW5hZ2EiLCJhIjoiY2wxMjU4ZjBnMDAwejNibXhrMmp6b3NweCJ9.o4JF8rJyfGYrodp6TaQROA";
   wgapp.map = new mapboxgl.Map({
     container: 'map', 
     style: {
@@ -29,42 +29,16 @@ $(function() {
   });
 
   wgapp.map.on('load', () => {
-    addPointCloudLayer(wgapp.map, 'point_cloud', './data/sample.csv');
+    addPointCloudLayer(wgapp.map, './data/sample.geojson', "value", 'point_cloud');
   });
 
 });
 
-function addPointCloudLayer(map, layerId, filename){
-  d3.csv(filename).then(function(data) {
-    pointCloudLayer = createPointCloudLayer(layerId, data);
-    map.addLayer(pointCloudLayer); 
-  }).catch(function(error){
-    console.log(error);
-    console.log("error : readCsv " + filename);
-  });
+function updateLayers(pDate) {
+  let ct = new Date(Math.floor(pDate.currentTime / 3600000) * 3600000);
+  var formatDate = String(ct.getFullYear()).padStart(4, '0') + String(ct.getMonth() + 1).padStart(2, '0') + String(ct.getDate()).padStart(2, '0');
+  var formatTime = String(ct.getHours()).padStart(2, '0') + String(ct.getMinutes()).padStart(2, '0');
+  console.log("updateDate " + formatDate + " " + formatTime);
+  updatePointCloudLayer(wgapp.map, './data/' + formatDate + formatTime + '.geojson', "value", 'point_cloud');
 }
 
-function createPointCloudLayer(layerId, pointData){
-  const { MapboxLayer, PointCloudLayer } = deck;
-
-  return new MapboxLayer({
-    id: layerId,
-    type: PointCloudLayer,
-    data: pointData,
-    getPosition: d => [Number(d.lng), Number(d.lat), Number(d.val)],
-    getColor: d => [255, 0, 0],
-    sizeUnits: 'meters',
-    pointSize: 10,
-    opacity: 1
-  });
-}
-
-function updateBargraph(formatDt){
-  console.log("updateBargraph " + formatDt);
-
-  const layerId = 'point_cloud';
-  if (wgapp.map.getLayer(layerId)) {
-    wgapp.map.removeLayer(layerId);
-  }
-  addPointCloudLayer(wgapp.map, layerId, './data/' + formatDt + '.csv');
-}

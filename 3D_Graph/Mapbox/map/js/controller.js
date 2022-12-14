@@ -22,11 +22,6 @@ function setPosition(pPosition){
 }
 
 function updateDate(pDate){
-  let ct = new Date(Math.floor(pDate.currentTime / wgapp.bargraph.timestep) * wgapp.bargraph.timestep);
-  var formatDate = String(ct.getFullYear()).padStart(4, '0') + String(ct.getMonth() + 1).padStart(2, '0') + String(ct.getDate()).padStart(2, '0');
-  var formatTime = String(ct.getHours()).padStart(2, '0') + String(ct.getMinutes()).padStart(2, '0');
-  console.log("updateDate " + formatDate + " " + formatTime);
-  wgapp.bargraph.currentData = "./data/" + formatDate + formatTime + ".csv"
-  updateBargraphSource(wgapp.bargraph.currentData, wgapp.bargraph.sourceId, wgapp.bargraph.radiusSize, wgapp.bargraph.elevationScale);
+  updateLayers(pDate);
 }
 

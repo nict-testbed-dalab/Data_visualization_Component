@@ -22,10 +22,6 @@ function setPosition(pPosition){
 }
 
 function updateDate(pDate){
-  let ct = new Date(Math.floor(pDate.currentTime / 3600000) * 3600000);
-  var formatDate = String(ct.getFullYear()).padStart(4, '0') + String(ct.getMonth() + 1).padStart(2, '0') + String(ct.getDate()).padStart(2, '0');
-  var formatTime = String(ct.getHours()).padStart(2, '0') + String(ct.getMinutes()).padStart(2, '0');
-  console.log("updateDate " + formatDate + " " + formatTime);
-  updateLayers(formatDate + formatTime);
+  updateLayers(pDate);
 }
 

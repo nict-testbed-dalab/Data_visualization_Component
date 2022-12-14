@@ -1,0 +1,20 @@
+{
+  "type":"FeatureCollection",
+  "features":[
+    {
+      "type":"Feature",
+      "properties":{"name":"渋谷", "direction":-31.07373255},
+      "geometry":{"type":"Point", "coordinates":[139.701334, 35.658517]}
+    },
+    {
+      "type":"Feature",
+      "properties":{"name":"原宿", "direction":5.389352196},
+      "geometry":{"type":"Point", "coordinates":[139.702687, 35.670168]}
+    },
+    {
+      "type":"Feature",
+      "properties":{"name":"代々木", "direction":-2.326924971},
+      "geometry":{"type":"Point", "coordinates":[139.702042, 35.683061]}
+    }
+  ]
+}

@@ -393,10 +393,10 @@ Data_visualization_Component/DataPreparationTool/
 
 
 ### 運用
-本システムでは、標準で成果物一式に格納されている「対象データ一覧表.xlsx」の対象データを運用できるようになっています。また、形式が同一のデータであれば利用者が独自にデータを追加して運用することが可能です。
+本システムでは、標準で[DataCatalog.pdf](/DataCatalog.pdf)の対象データを運用できるようになっています。また、形式が同一のデータであれば利用者が独自にデータを追加して運用することが可能です。
 
 #### データ収集
-「対象データ一覧表.xlsx」に記載されているデータ取得元から、本システムで運用したデータを収集して下さい。対象となるデータには年度更新(数年に一度の更新も含む)のあるものもあり、更新があった場合には最新のデータを追加して本システムを運用することが可能です。
+[DataCatalog.pdf](/DataCatalog.pdf)に記載されているデータ取得元から、本システムで運用したデータを収集して下さい。対象となるデータには年度更新(数年に一度の更新も含む)のあるものもあり、更新があった場合には最新のデータを追加して本システムを運用することが可能です。
 
 ##### 国土地理院が提供するダウンロードツールによる地理院タイルの収集
 国土地理院は、国土地理院が公開する地理院タイルについてダウンロードツールを公開しています。
@@ -803,7 +803,7 @@ NameとネームスペースURIを設定し、送信をクリックします。N
 
 ### iTowns
 #### テンプレートアプリケーションの設置
-成果物一式に格納されている「itowns_template.zip」を展開し、
+[TemplateWebGIS_iTowns](https://github.com/nict-testbed-dalab/TemplateWebGIS_iTowns)からdata、js、layers、test_itw、auth_config.json、index.htmlを取得し、
 
 /var/www/html/itowns_template
 
@@ -821,7 +821,7 @@ NameとネームスペースURIを設定し、送信をクリックします。N
 
 
 #### サンプルアプリケーションの設置
-成果物一式に格納されている「itwons_sample.zip」を展開し、
+[UseCase_Examples/itowns_sample](https://github.com/nict-testbed-dalab/UseCase_Examples/tree/main/itowns_sample)を取得し、
 
 /var/www/html/itowns_sample
 

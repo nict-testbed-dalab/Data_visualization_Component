@@ -268,6 +268,116 @@ curl -k https://localhost:8443/
 図 32 GeoServerの管理インターフェース(ログイン後)
 
 
+### KrakenD
+#### インストール
+次のコマンドを実行して下さい。
+1. KrakenDをインストール （１，２行目：krakendのキーの登録、３行目：パッケージリストの更新）
+```
+sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 5DE6FD698AD6FDD2
+sudo echo "deb https://repo.krakend.io/apt stable main" | sudo tee /etc/apt/sources.list.d/krakend.list
+sudo apt-get update
+sudo apt-get install -y krakend
+```
+
+2. ディレクトリ作成
+```
+cd （ユーザディレクトリなど）
+mkdir krakend
+```
+
+3. 設定ファイルの確認
+
+設定ファイルkrakend.jsonを確認します。
+```
+cd ./krakend
+view krakend.json
+```
+
+#### 起動
+次のコマンドを実行し、バックグラウンドで起動させます。
+1. 起動
+```
+nohup krakend run --config krakend.json &amp;
+```
+
+#### 停止
+次のコマンドを実行します。
+1. 実行プロセスを表示
+```
+ps aux | grep krakend
+```
+
+2. 一覧の「krakend run」のプロセスIDを指定し、プロセスを終了します。
+（プロセスIDは起動ごとに異なります。）
+
+```
+kill 123456
+```
+
+### FastAPI
+#### インストール
+次のコマンドを実行します。
+
+1. pip3のインストール（インストールされていない場合のみ）
+```
+sudo apt update
+sudo apt install python3-pip
+```
+
+確認メッセージでは「Y」を入力します。
+
+2. 各種フレームワークのインストール（関連パッケージも自動的にインストールされます）
+```
+pip3 install fastapi
+pip3 install db
+pip3 install databases
+pip3 install sqlalchemy
+pip3 install starlette
+pip3 install uvicorn
+pip3 install python-dotenv
+```
+
+3. インストールされたことを確認します。成功したフレームワーク名が表示されます。
+```
+pip3 list
+```
+
+#### mainファイルの配置
+次のコマンドを実行します。
+1. ディレクトリ作成
+``` 
+cd （ユーザディレクトリなど）
+mkdir api
+```
+
+このapiディレクトリ配下に、main.pyを配置します。
+
+
+#### 起動
+次のコマンドを実行します。
+
+1. バックグラウンドで実行させます。
+（リロードモードでの実行で、ソース修正時は自動的に反映されます。）
+```
+cd ./api
+nohup python3 -m uvicorn main:app --reload --port 5000 &amp;
+```
+
+#### 停止
+次のコマンドを実行します。
+
+1. 実行プロセスを表示
+```
+ps aux | grep uvicorn
+```
+
+2. 一覧の「python3 -m uvcorn」のプロセスIDを指定し、プロセスを終了します。
+（プロセスIDは起動ごとに異なります 。）
+
+```
+kill 123456
+```
+
 ## データ取得変換ツール
 ### 前提条件および概要
 データ取得変換ツールでは、収集したデータを必要に応じてデータ分析・可視化システムで利用可能な形に変換します。変換したファイルをWebサーバに配置する、又は直接Webサーバを出力先として変換配置することでWebGISから参照可能となり、本システムにデータを追加できます。本システムからのデータ削除は、配置又は変換配置したファイルの削除により可能です。ただし、収集データうちGeoServerへ登録して配信するものについては、GeoServerへの登録/削除により本システムへの追加/削除を行います。

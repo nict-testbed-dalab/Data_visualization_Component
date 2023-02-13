@@ -909,7 +909,51 @@ NameとネームスペースURIを設定し、送信をクリックします。N
 
 ## WebGISアプリケーション
 ### Mapbox
-別途記載
+#### テンプレートアプリケーションの設置
+[TemplateWebGIS_Mapbox](https://github.com/nict-testbed-dalab/TemplateWebGIS_Mapbox)からMapbox_map、css、img、js、timeline、auth_config.json、index.htmlを取得し、
+
+/var/www/html/mapbox_template/
+へ配置して下さい。このディレクトリの内容が
+![](media/ENVIRONMENT/image20.png)
+となっていれば、正しく配置できています。この状態で、対応Webブラウザにより
+
+[https://tb-gis-web.jgn-x.jp/mapbox_template/](https://tb-gis-web.jgn-x.jp/mapbox_template/)
+
+へアクセスして、図 51のように地理情報が表示できれば設置は成功です。表示が成功しない場合は、環境構築の状況を確認して下さい。
+
+![](media/ENVIRONMENT/image21.png)
+
+図 51　テンプレートアプリケーションの初期画面
+
+#### サンプルアプリケーションの設置
+[UseCase_Examples/mapbox_sample](https://github.com/nict-testbed-dalab/UseCase_Examples/tree/main/mapbox_sample)を取得し、
+
+/var/www/html/mapbox_sample
+
+へ配置して下さい。このディレクトリの内容が
+![](media/ENVIRONMENT/image22.png)
+となっていれば、正しく配置できています。この状態で、対応Webブラウザにより
+
+[https://tb-gis-web.jgn-x.jp/mapbox_sample/](https://tb-gis-web.jgn-x.jp/mapbox_sample/)
+
+へアクセスして、図 52のように地理情報が表示できれば設置は成功です。表示が成功しない場合は、環境構築の状況を確認して下さい。
+
+![](media/ENVIRONMENT/image21.png)
+
+図 52 サンプルアプリケーションの初期画面
+
+#### (参考)mapboxのビルド環境も併せて構築する場合
+テンプレートアプリケーションやサンプルアプリケーションを参考に独自のアプリケーションを開発する際、ベースとなっているmapbox(mapbox-gl:v1.13.3)のビルド環境も併せて構築すると、mapboxの公式サンプルによる学習を行いながら開発を進めることができます。
+
+mapboxのビルド環境を構築する場合は下のURLを参考にして下さい。
+
+Mapbox GL JSリポジトリ
+[https://github.com/mapbox/mapbox-gl-js/](https://github.com/mapbox/mapbox-gl-js/tree/v1.13.3)
+
+Mapbox GL JS概要
+[https://docs.mapbox.com/jp/mapbox-gl-js/overview/](https://docs.mapbox.com/jp/mapbox-gl-js/overview/)
+　：本アプリケーションのバージョンはv1であるため、最新バージョンv2の新機能は実装できません。
+
 
 ### iTowns
 #### テンプレートアプリケーションの設置
@@ -923,11 +967,11 @@ NameとネームスペースURIを設定し、送信をクリックします。N
 
 [https://tb-gis-web.jgn-x.jp/itowns_template/](https://tb-gis-web.jgn-x.jp/itowns_template/)
 
-へアクセスして、図 51のように地理情報が表示できれば設置は成功です。表示が成功しない場合は、環境構築の状況を確認して下さい。
+へアクセスして、図 53のように地理情報が表示できれば設置は成功です。表示が成功しない場合は、環境構築の状況を確認して下さい。
 
 ![](media/ENVIRONMENT/image18.png)
 
-図 51　テンプレートアプリケーションの初期画面
+図 53　テンプレートアプリケーションの初期画面
 
 
 #### サンプルアプリケーションの設置
@@ -941,11 +985,11 @@ NameとネームスペースURIを設定し、送信をクリックします。N
 
 [https://tb-gis-web.jgn-x.jp/itwons_sample/](https://tb-gis-web.jgn-x.jp/itwons_sample/)
 
-へアクセスして、図 52のように地理情報が表示できれば設置は成功です。表示が成功しない場合は、環境構築の状況を確認して下さい。
+へアクセスして、図 54のように地理情報が表示できれば設置は成功です。表示が成功しない場合は、環境構築の状況を確認して下さい。
 
 ![](media/ENVIRONMENT/image19.png)
 
-図 52 サンプルアプリケーションの初期画面
+図 54 サンプルアプリケーションの初期画面
 
 #### (参考)iTownsのビルド環境も併せて構築する場合
 テンプレートアプリケーションやサンプルアプリケーションを参考に独自のアプリケーションを開発する際、ベースとなっているiTownsのビルド環境も併せて構築すると、iTownsの公式サンプルによる学習を行いながら開発を進めることができます。

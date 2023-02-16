@@ -30,7 +30,7 @@ function updateBargraphLayer(map, file, dataname, layerId, sourceId, color, radi
     updateBargraphLayerByCsvFile(map, file, dataname, layerId, sourceId, color, radiusSize, elevationScale);
   } else if(file.split('.').pop() == "geojson") {
     updateBargraphLayerByGeoJsonFile(map, file, dataname, layerId, sourceId, color, radiusSize, elevationScale);
-  }  
+  }
 }
 
 function updateBargraphLayerByCsvFile(map, csvfile, column, layerId, sourceId, color, radiusSize, elevationScale){
@@ -117,7 +117,7 @@ function createSourceDataByGeoJsonData(geojsonData, key, radiusSize, elevationSc
 /**/
 /**/
 /**/
-function addMovingObjectLayer(map, file, layerId, sourceId, color, size) {
+function addMovingObjectLayer(map, file, layerId, sourceId, colorName, sizeName, heightName, colorMin, colorMax, sizeBase, sizeScale, barColor, barScale) {
   map.addSource(sourceId, {
     "type": "geojson",
     "data": {
@@ -131,31 +131,29 @@ function addMovingObjectLayer(map, file, layerId, sourceId, color, size) {
     'type': 'fill-extrusion',
     'source': sourceId,
     'paint': {
-      'fill-extrusion-color': color,
+      'fill-extrusion-color': ['get', 'color'],
       'fill-extrusion-height': ['get', 'height'],
       'fill-extrusion-base': ['get', 'base'],
-      'fill-extrusion-opacity': 0.9
+      'fill-extrusion-opacity': 0.85
     }
   });
 
-  updateMovingObjectLayer(map, file, layerId, sourceId, color, size);
+  updateMovingObjectLayer(map, file, layerId, sourceId, colorName, sizeName, heightName, colorMin, colorMax, sizeBase, sizeScale, barColor, barScale);
 }
 
-function updateMovingObjectLayer(map, file, layerId, sourceId, color, size) {
+function updateMovingObjectLayer(map, file, layerId, sourceId, colorName, sizeName, heightName, colorMin, colorMax, sizeBase, sizeScale, barColor, barScale) {
   if(file.split('.').pop() == "csv"){
-    updateMovingObjectLayerByCsvFile(map, file, layerId, sourceId, color, size);
+    updateMovingObjectLayerByCsvFile(map, file, layerId, sourceId, colorName, sizeName, heightName, colorMin, colorMax, sizeBase, sizeScale, barColor, barScale);
   } else if(file.split('.').pop() == "geojson") {
-    updateMovingObjectLayerByGeoJsonFile(map, file, layerId, sourceId, color, size);
-  }  
+    updateMovingObjectLayerByGeoJsonFile(map, file, layerId, sourceId, colorName, sizeName, heightName, colorMin, colorMax, sizeBase, sizeScale, barColor, barScale);
+  }
 }
 
-function updateMovingObjectLayerByCsvFile(map, csvfile, layerId, sourceId, color, size){
+function updateMovingObjectLayerByCsvFile(map, csvfile, layerId, sourceId, colorColumn, sizeColumn, heightColumn, colorMin, colorMax, sizeBase, sizeScale, barColor, barScale){
   d3.csv(csvfile).then(function(csvdata) {
-    let data = createMovingObjectSourceByCsvData(csvdata, size);
+    let data = createMovingObjectSourceByCsvData(csvdata, colorColumn, sizeColumn, heightColumn, colorMin, colorMax, sizeBase, sizeScale, barColor, barScale);
     map.getSource(sourceId).setData(data);
     map.setLayoutProperty(layerId, 'visibility', 'visible');
-    map.setPaintProperty(layerId, 'fill-extrusion-color', color);
-
   }).catch(function(error){
     console.log(error);
     console.log("error : readCsv " + csvfile);
@@ -165,33 +163,50 @@ function updateMovingObjectLayerByCsvFile(map, csvfile, layerId, sourceId, color
   });
 }
 
-function createMovingObjectSourceByCsvData(csvdata, size){
+function createMovingObjectSourceByCsvData(csvdata, colorColumn, sizeColumn, heightColumn, colorMin, colorMax, sizeBase, sizeScale, barColor, barScale){
   let data = {
     "type": "FeatureCollection",
     "features": []
   };
 
   csvdata.map(function(d, i) {
-    const properties = {
+    let size = parseFloat(d[sizeColumn]) * sizeScale + sizeBase;
+
+    const objProperties = {
       index : i,
-      height : size / 2,
-      base : 0
+      height : sizeBase / 2,
+      color : getColorCode(d[colorColumn], colorMin, colorMax),
+      base : 0,
+      opacity : 0.9
     };
-    let feature = createMovingObjectPolygon(parseFloat(d.lng), parseFloat(d.lat), size, parseFloat(d.direction), properties);
-    data.properties = properties;
-    data.features.push(feature);
+    let objFeature = createMovingObjectPolygon(parseFloat(d.lng), parseFloat(d.lat), size, parseFloat(d.direction), objProperties);
+    data.features.push(objFeature);
+
+    const barProperties = {
+      index : i,
+      height : (parseFloat(d[heightColumn]) * barScale),
+      color : barColor,
+      base : sizeBase / 2,
+      opacity : 0.7
+    };
+    const options = {
+      steps: 4,
+      units: 'meters',
+      properties: barProperties
+    };
+    let barFeature = turf.circle(turf.point([parseFloat(d.lng), parseFloat(d.lat)]), sizeBase / 4, options);
+    data.features.push(barFeature);
+
   });
 
-  console.log(JSON.stringify(data));
   return data;
 }
 
-function updateMovingObjectLayerByGeoJsonFile(map, geojsonfile, layerId, sourceId, color, size) {
+function updateMovingObjectLayerByGeoJsonFile(map, geojsonfile, layerId, sourceId, colorKey, sizeKey, heightKey, colorMin, colorMax, sizeBase, sizeScale, barColor, barScale) {
   d3.json(geojsonfile).then(function(geojsonData) {
-    let data = createMovingObjectSourceDataByGeoJsonData(geojsonData, size);
+    let data = createMovingObjectSourceDataByGeoJsonData(geojsonData, colorKey, sizeKey, heightKey, colorMin, colorMax, sizeBase, sizeScale, barColor, barScale);
     map.getSource(sourceId).setData(data);
     map.setLayoutProperty(layerId, 'visibility', 'visible');
-    map.setPaintProperty(layerId, 'fill-extrusion-color', color);
   }).catch(function(error) {
     console.log(error);
     console.log("error : readGeoJson " + geojsonfile);
@@ -201,20 +216,40 @@ function updateMovingObjectLayerByGeoJsonFile(map, geojsonfile, layerId, sourceI
   });
 }
 
-function createMovingObjectSourceDataByGeoJsonData(geojsonData, size){
+function createMovingObjectSourceDataByGeoJsonData(geojsonData, colorKey, sizeKey, heightKey, colorMin, colorMax, sizeBase, sizeScale, barColor, barScale){
   let data = {
     "type": "FeatureCollection",
     "features": []
   };
 
   geojsonData.features.forEach(function (object, i) {
-    object.properties.height = size / 2;
-    object.properties.base = 0;
-    object.properties.index = i;
 
-    const point = object.geometry.coordinates;
-    let feature = createMovingObjectPolygon(object.geometry.coordinates[0], object.geometry.coordinates[1], size, object.properties.direction, object.properties);
-    data.features.push(feature);
+    let size = parseFloat(object.properties[sizeKey]) * sizeScale + sizeBase;
+
+    const objProperties = {
+      index : i,
+      height : sizeBase / 2,
+      color : getColorCode(object.properties[colorKey], colorMin, colorMax),
+      base : 0,
+      opacity : 0.9
+    };
+    let objFeature = createMovingObjectPolygon(object.geometry.coordinates[0], object.geometry.coordinates[1], size, object.properties.direction, objProperties);
+    data.features.push(objFeature);
+
+    const barProperties = {
+      index : i,
+      height : (parseFloat(object.properties[heightKey]) * barScale),
+      color : barColor,
+      base : sizeBase / 2,
+      opacity : 0.7
+    };
+    const options = {
+      steps: 4,
+      units: 'meters',
+      properties: barProperties
+    };
+    let barFeature = turf.circle(object.geometry.coordinates, sizeBase / 4, options);
+    data.features.push(barFeature);
   });
 
   return data;
@@ -237,11 +272,11 @@ function createMovingObjectPolygon(centerLng, centerLat, size, direction, proper
     [f.geometry.coordinates[0], f.geometry.coordinates[1]]
   ]], properties);
 
-	console.log(direction);
   feature = turf.transformRotate(feature, direction, {pivot: point});
 
   return feature;
 }
+
 /**/
 /**/
 /**/
@@ -345,15 +380,6 @@ function createPointCloudLayerByCSV(pointData, column, layerId){
   });
 }
 
-function convertColor(val){
-  if(val >  100)              return [                            255,                                0,                               0];
-  if(val <= 100 && val >= 75) return [                            255, parseInt(255 * (100 - val) / 25),                               0];
-  if(val <=  75 && val >= 50) return [parseInt(255 * (val - 50) / 25),                              255,                               0];
-  if(val <=  50 && val >= 25) return [                              0,                              255, parseInt(255 * (50 - val) / 25)];
-  if(val <=  25 && val >=  0) return [                              0,         parseInt(255 * val / 25),                             255];
-  if(val <    0)              return [                              0,                                0,                             255];
-}
-
 /**/
 /**/
 /**/
@@ -454,5 +480,25 @@ function convertPointColorInPlane(pointData, planeDataArray){
     }
   }
   return defaultColor;
+}
+
+
+
+function getColorCode(val, min, max){
+  var rgb = convertColor(val, min, max);
+  return "#" + rgb.map(c => ("0" + c.toString(16)).slice(-2)).join("");
+
+}
+
+function convertColor(val, min, max){
+  //var max = 100;
+  //var min = 0;
+  var dif = max - min;
+  if(                           val >  max             ) return [                            255,                                0,                               0];
+  if(val <= max              && val >= min + 0.75 * dif) return [                            255, parseInt(255 * (100 - val) / 25),                               0];
+  if(val <= min + 0.75 * dif && val >= min + 0.5  * dif) return [parseInt(255 * (val - 50) / 25),                              255,                               0];
+  if(val <= min + 0.5  * dif && val >= min + 0.25 * dif) return [                              0,                              255, parseInt(255 * (50 - val) / 25)];
+  if(val <= min + 0.25 * dif && val >= min             ) return [                              0,         parseInt(255 * val / 25),                             255];
+  if(val <  min                                        ) return [                              0,                                0,                             255];
 }
 

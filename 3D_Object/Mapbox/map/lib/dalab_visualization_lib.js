@@ -1,154 +1,504 @@
-var $DisplayCapture = {
-  Stream : null,
-};
-
-function startDisplayCapture(pCallback) {
-  if ($DisplayCapture.Stream) {
-    if ($DisplayCapture.Stream.active) {
-      if (typeof pCallback == "function") {
-        pCallback({ status : true });
-      }
-      return;
-    } else {
-      stopDisplayCapture();
+/**/
+/**/
+/**/
+function addBargraphLayer(map, file, dataname, layerId, sourceId, color, radiusSize, elevationScale) {
+  map.addSource(sourceId, {
+    "type": "geojson",
+    "data": {
+      type: 'FeatureCollection',
+      features: []
     }
+  });
+
+  map.addLayer({
+    'id': layerId,
+    'type': 'fill-extrusion',
+    'source': sourceId,
+    'paint': {
+      'fill-extrusion-color': color,
+      'fill-extrusion-height': ['get', 'height'],
+      'fill-extrusion-base': ['get', 'base'],
+      'fill-extrusion-opacity': 0.75
+    }
+  });
+
+  updateBargraphLayer(map, file, dataname, layerId, sourceId, color, radiusSize, elevationScale);
+}
+
+function updateBargraphLayer(map, file, dataname, layerId, sourceId, color, radiusSize, elevationScale) {
+  if(file.split('.').pop() == "csv"){
+    updateBargraphLayerByCsvFile(map, file, dataname, layerId, sourceId, color, radiusSize, elevationScale);
+  } else if(file.split('.').pop() == "geojson") {
+    updateBargraphLayerByGeoJsonFile(map, file, dataname, layerId, sourceId, color, radiusSize, elevationScale);
   }
+}
 
-  let objMediaDevices = navigator.getDisplayMedia ? navigator : navigator.mediaDevices;
+function updateBargraphLayerByCsvFile(map, csvfile, column, layerId, sourceId, color, radiusSize, elevationScale){
+  d3.csv(csvfile).then(function(csvdata) {
+    let data = createSourceByCsvData(csvdata, column, radiusSize, elevationScale);
+    map.getSource(sourceId).setData(data);
+    map.setLayoutProperty(layerId, 'visibility', 'visible');
+    map.setPaintProperty(layerId, 'fill-extrusion-color', color);
 
-  objMediaDevices.getDisplayMedia({
-    video : {
-      displaySurface : "browser",
-      cursor         : { exact : "none" }
-    },
-    audio : false
-  }).then(function(pStream) {
-    pStream.addEventListener("inactive", function() { stopDisplayCapture(); }, false);
-
-    let $video = $("<video class='displayCapture'></video>");
- 
-    $video   .css   ({ position : "absolute", left : "100vw", top : "100vh" });
-    $("body").append($video);
-    $video[0].srcObject = pStream;
-    $video[0].play  ();
-
-    $DisplayCapture.Stream = pStream;
-    if (typeof pCallback == "function") {
-      setTimeout(function() { pCallback({ status : true }); }, 1000);
-    }
-  }).catch(function(pError) {
-    if (typeof pCallback == "function") {
-      pCallback({ status : false, error : pError });
+  }).catch(function(error){
+    console.log(error);
+    console.log("error : readCsv " + csvfile);
+    if (map.getLayer(layerId)) {
+      map.setLayoutProperty(layerId, 'visibility', 'none');
     }
   });
 }
 
-function getDisplayCapture(pCallback) {
-  //console.log($DisplayCapture.Stream);
-  if (!$DisplayCapture.Stream) {
-    return;
-  }
+function createSourceByCsvData(csvdata, column, radiusSize, elevationScale){
+  let data = {
+    "type": "FeatureCollection",
+    "features": []
+  };
 
-  let $video     = $("video.displayCapture");
-  let $canvas    = $("<canvas class='displayCapture'></canvas>");
-  let objContext = $canvas[0].getContext("2d");
+  csvdata.map(function(d, i) {
+    const properties = {
+      index : i,
+      height : (parseFloat(d[column]) * elevationScale),
+      base : 0
+    };
+    const options = {
+      steps: 4,
+      units: 'meters',
+      properties: properties
+    };
+    const feature = turf.circle(turf.point([parseFloat(d.lng), parseFloat(d.lat)]), radiusSize, options);
+    data.properties = properties;
+    data.features.push(feature);
+  });
 
-  $canvas  .css   ("display", "none");
-  $("body").append($canvas);
-  $canvas  .attr  ("width"  , $video[0].offsetWidth );
-  $canvas  .attr  ("height" , $video[0].offsetHeight);
-
-  objContext.drawImage($video[0], 0, 0, $video[0].offsetWidth, $video[0].offsetHeight);
-
-  if ($canvas[0].toBlob){
-    $canvas[0].toBlob(function(pBlob){
-      pCallback(window.URL.createObjectURL(pBlob));
-      $canvas.remove();
-    }, "image/jpeg", 1);
-  } else if ($canvas[0].msToBlob) {
-    pCallback(window.URL.createObjectURL($canvas[0].msToBlob()));
-    $canvas.remove();
-  } else {
-    pCallback(null);
-    $canvas.remove();
-  }
+  return data;
 }
 
-function stopDisplayCapture() {
-  if ($DisplayCapture.Stream) {
-    $DisplayCapture.Stream.getTracks()[0].stop();
-    delete $DisplayCapture.Stream;
-  }
-
-  $("canvas.displayCapture").remove();
-  $( "video.displayCapture").remove();
-}
-
-function download (pUrl, pFileName, pCallback) {
-  console.log(pUrl);
-  console.log(pFileName);
-  let strFileName       = typeof pFileName == "string" ? pFileName : pUrl.match(".+/(.+?)([\?#;].*)?$")[1];
-  let objXMLHttpRequest = new XMLHttpRequest();
-
-  objXMLHttpRequest.open("GET", pUrl, true);
-  objXMLHttpRequest.responseType = "blob";
-
-  objXMLHttpRequest.onload = function() {
-    if (objXMLHttpRequest.status !== 200) {
-      alert("download error. return code = " + objXMLHttpRequest.status);
-    } else {
-      if (window.navigator.msSaveBlob){
-        window.navigator.msSaveBlob(objXMLHttpRequest.response, strFileName);
-      } else {
-        let $download = $("<a css='display:none;' href='" + window.URL.createObjectURL(objXMLHttpRequest.response) + "' download='" + strFileName + "'></a>");
-
-        $("body").append($download);
-
-        $download[0].click ();
-        $download   .remove();
-      }
+function updateBargraphLayerByGeoJsonFile(map, geojsonfile, key, layerId, sourceId, color, radiusSize, elevationScale) {
+  d3.json(geojsonfile).then(function(geojsonData) {
+    let data = createSourceDataByGeoJsonData(geojsonData, key, radiusSize, elevationScale);
+    map.getSource(sourceId).setData(data);
+    map.setLayoutProperty(layerId, 'visibility', 'visible');
+    map.setPaintProperty(layerId, 'fill-extrusion-color', color);
+  }).catch(function(error) {
+    console.log(error);
+    console.log("error : readGeoJson " + geojsonfile);
+    if (map.getLayer(layerId)) {
+      map.setLayoutProperty(layerId, 'visibility', 'none');
     }
+  });
+}
 
-    if (typeof pCallback == "function") {
-      pCallback();
+function createSourceDataByGeoJsonData(geojsonData, key, radiusSize, elevationScale){
+  let data = {
+    "type": "FeatureCollection",
+    "features": []
+  };
+
+  geojsonData.features.forEach(function (object, i) {
+    object.properties.height = object.properties[key] * elevationScale;
+    object.properties.base = 0;
+    object.properties.index = i;
+
+    const point = object.geometry.coordinates
+    const options = {
+      steps: 4,
+      units: 'meters',
+      properties: object.properties
+    };
+    const feature = turf.circle(point, radiusSize, options);
+
+    data.features.push(feature);
+  });
+  return data;
+}
+
+
+/**/
+/**/
+/**/
+function addMovingObjectLayer(map, file, layerId, sourceId, colorName, sizeName, heightName, colorMin, colorMax, sizeBase, sizeScale, barColor, barScale) {
+  map.addSource(sourceId, {
+    "type": "geojson",
+    "data": {
+      type: 'FeatureCollection',
+      features: []
+    }
+  });
+
+  map.addLayer({
+    'id': layerId,
+    'type': 'fill-extrusion',
+    'source': sourceId,
+    'paint': {
+      'fill-extrusion-color': ['get', 'color'],
+      'fill-extrusion-height': ['get', 'height'],
+      'fill-extrusion-base': ['get', 'base'],
+      'fill-extrusion-opacity': 0.85
+    }
+  });
+
+  updateMovingObjectLayer(map, file, layerId, sourceId, colorName, sizeName, heightName, colorMin, colorMax, sizeBase, sizeScale, barColor, barScale);
+}
+
+function updateMovingObjectLayer(map, file, layerId, sourceId, colorName, sizeName, heightName, colorMin, colorMax, sizeBase, sizeScale, barColor, barScale) {
+  if(file.split('.').pop() == "csv"){
+    updateMovingObjectLayerByCsvFile(map, file, layerId, sourceId, colorName, sizeName, heightName, colorMin, colorMax, sizeBase, sizeScale, barColor, barScale);
+  } else if(file.split('.').pop() == "geojson") {
+    updateMovingObjectLayerByGeoJsonFile(map, file, layerId, sourceId, colorName, sizeName, heightName, colorMin, colorMax, sizeBase, sizeScale, barColor, barScale);
+  }
+}
+
+function updateMovingObjectLayerByCsvFile(map, csvfile, layerId, sourceId, colorColumn, sizeColumn, heightColumn, colorMin, colorMax, sizeBase, sizeScale, barColor, barScale){
+  d3.csv(csvfile).then(function(csvdata) {
+    let data = createMovingObjectSourceByCsvData(csvdata, colorColumn, sizeColumn, heightColumn, colorMin, colorMax, sizeBase, sizeScale, barColor, barScale);
+    map.getSource(sourceId).setData(data);
+    map.setLayoutProperty(layerId, 'visibility', 'visible');
+  }).catch(function(error){
+    console.log(error);
+    console.log("error : readCsv " + csvfile);
+    if (map.getLayer(layerId)) {
+      map.setLayoutProperty(layerId, 'visibility', 'none');
+    }
+  });
+}
+
+function createMovingObjectSourceByCsvData(csvdata, colorColumn, sizeColumn, heightColumn, colorMin, colorMax, sizeBase, sizeScale, barColor, barScale){
+  let data = {
+    "type": "FeatureCollection",
+    "features": []
+  };
+
+  csvdata.map(function(d, i) {
+    let size = parseFloat(d[sizeColumn]) * sizeScale + sizeBase;
+
+    const objProperties = {
+      index : i,
+      height : sizeBase / 2,
+      color : getColorCode(d[colorColumn], colorMin, colorMax),
+      base : 0,
+      opacity : 0.9
+    };
+    let objFeature = createMovingObjectPolygon(parseFloat(d.lng), parseFloat(d.lat), size, parseFloat(d.direction), objProperties);
+    data.features.push(objFeature);
+
+    const barProperties = {
+      index : i,
+      height : (parseFloat(d[heightColumn]) * barScale),
+      color : barColor,
+      base : sizeBase / 2,
+      opacity : 0.7
+    };
+    const options = {
+      steps: 4,
+      units: 'meters',
+      properties: barProperties
+    };
+    let barFeature = turf.circle(turf.point([parseFloat(d.lng), parseFloat(d.lat)]), sizeBase / 4, options);
+    data.features.push(barFeature);
+
+  });
+
+  return data;
+}
+
+function updateMovingObjectLayerByGeoJsonFile(map, geojsonfile, layerId, sourceId, colorKey, sizeKey, heightKey, colorMin, colorMax, sizeBase, sizeScale, barColor, barScale) {
+  d3.json(geojsonfile).then(function(geojsonData) {
+    let data = createMovingObjectSourceDataByGeoJsonData(geojsonData, colorKey, sizeKey, heightKey, colorMin, colorMax, sizeBase, sizeScale, barColor, barScale);
+    map.getSource(sourceId).setData(data);
+    map.setLayoutProperty(layerId, 'visibility', 'visible');
+  }).catch(function(error) {
+    console.log(error);
+    console.log("error : readGeoJson " + geojsonfile);
+    if (map.getLayer(layerId)) {
+      map.setLayoutProperty(layerId, 'visibility', 'none');
+    }
+  });
+}
+
+function createMovingObjectSourceDataByGeoJsonData(geojsonData, colorKey, sizeKey, heightKey, colorMin, colorMax, sizeBase, sizeScale, barColor, barScale){
+  let data = {
+    "type": "FeatureCollection",
+    "features": []
+  };
+
+  geojsonData.features.forEach(function (object, i) {
+
+    let size = parseFloat(object.properties[sizeKey]) * sizeScale + sizeBase;
+
+    const objProperties = {
+      index : i,
+      height : sizeBase / 2,
+      color : getColorCode(object.properties[colorKey], colorMin, colorMax),
+      base : 0,
+      opacity : 0.9
+    };
+    let objFeature = createMovingObjectPolygon(object.geometry.coordinates[0], object.geometry.coordinates[1], size, object.properties.direction, objProperties);
+    data.features.push(objFeature);
+
+    const barProperties = {
+      index : i,
+      height : (parseFloat(object.properties[heightKey]) * barScale),
+      color : barColor,
+      base : sizeBase / 2,
+      opacity : 0.7
+    };
+    const options = {
+      steps: 4,
+      units: 'meters',
+      properties: barProperties
+    };
+    let barFeature = turf.circle(object.geometry.coordinates, sizeBase / 4, options);
+    data.features.push(barFeature);
+  });
+
+  return data;
+}
+
+function createMovingObjectPolygon(centerLng, centerLat, size, direction, properties) {
+  const point = turf.point([centerLng, centerLat]);
+  let options = {
+    units: 'meters',
+  };
+
+  let f = turf.destination(point, size,     0, options);
+  let lb = turf.destination(point, size, -160, options);
+  let rb = turf.destination(point, size,  160, options);
+
+  feature = turf.polygon([[
+    [f.geometry.coordinates[0], f.geometry.coordinates[1]],
+    [lb.geometry.coordinates[0], lb.geometry.coordinates[1]],
+    [rb.geometry.coordinates[0], rb.geometry.coordinates[1]],
+    [f.geometry.coordinates[0], f.geometry.coordinates[1]]
+  ]], properties);
+
+  feature = turf.transformRotate(feature, direction, {pivot: point});
+
+  return feature;
+}
+
+/**/
+/**/
+/**/
+function addPlaneGroupLayer(map, filename, dataname, layerId){
+  d3.json(filename).then(function(data) {
+    planeGroupLayer = createPlaneGroupLayer(data.features, dataname, layerId);
+    map.addLayer(planeGroupLayer);
+  }).catch(function(error){
+    console.log(error);
+    console.log("error : readGeoJSON " + filename);
+  });
+}
+
+function createPlaneGroupLayer(planeData, key, layerId){
+  const layer = new deck.MapboxLayer({
+    id: layerId,
+    type: deck.PolygonLayer,
+    data: planeData,
+    getPolygon: d => d.geometry.coordinates,
+    getElevation: d => 0,
+    getFillColor: d => convertColor(d.properties[key]),
+    getLineColor: [255, 0, 0],
+    opacity: 0.5,
+  });
+
+  return layer;
+}
+
+function updatePlaneGroupLayer(map, filename, dataname, layerId){
+  if (map.getLayer(layerId)) {
+    map.removeLayer(layerId);
+  }
+  addPlaneGroupLayer(map, filename, dataname, layerId);
+}
+
+/**/
+/**/
+/**/
+function addPointCloudLayer(map, filename, dataname, layerId){
+  if(filename.split('.').pop() == "csv"){
+    addPointCloudLayerByCSV(map, filename, dataname, layerId);
+  } else if(filename.split('.').pop() == "geojson") {
+    addPointCloudLayerByGeoJson(map, filename, dataname, layerId);
+  }
+}
+
+function updatePointCloudLayer(map, filename, dataname, layerId){
+  if (map.getLayer(layerId)) {
+    map.removeLayer(layerId);
+  }
+  addPointCloudLayer(map, filename, dataname, layerId);
+}
+
+function addPointCloudLayerByGeoJson(map, filename, key, layerId){
+  d3.json(filename).then(function(data) {
+    pointCloudLayer = createPointCloudLayerByGeoJson(data.features, key, layerId);
+    map.addLayer(pointCloudLayer);
+  }).catch(function(error){
+    console.log(error);
+    console.log("error : readCsv " + filename);
+  });
+}
+
+function createPointCloudLayerByGeoJson(pointData, key, layerId){
+  const { MapboxLayer, PointCloudLayer } = deck;
+
+  return new MapboxLayer({
+    id: layerId,
+    type: PointCloudLayer,
+    data: pointData,
+    getPosition: d => [d.geometry.coordinates[0], d.geometry.coordinates[1], 100],
+    getColor: d => convertColor(d.properties[key]),
+    sizeUnits: 'meters',
+    pointSize: 30,
+    opacity: 1
+  });
+}
+
+function addPointCloudLayerByCSV(map, filename, column, layerId){
+  d3.csv(filename).then(function(data) {
+    pointCloudLayer = createPointCloudLayerByCSV(data, column, layerId);
+    map.addLayer(pointCloudLayer);
+  }).catch(function(error){
+    console.log(error);
+    console.log("error : readCsv " + filename);
+  });
+}
+
+function createPointCloudLayerByCSV(pointData, column, layerId){
+  const { MapboxLayer, PointCloudLayer } = deck;
+
+  return new MapboxLayer({
+    id: layerId,
+    type: PointCloudLayer,
+    data: pointData,
+    getPosition: d => [Number(d.lng), Number(d.lat), 100],
+    getColor: d => convertColor(d[column]),
+    sizeUnits: 'meters',
+    pointSize: 20,
+    opacity: 1
+  });
+}
+
+/**/
+/**/
+/**/
+
+function addRelativePositionPointLayer(map, filename, planeLayerId, layerId){
+  if(filename.split('.').pop() == "csv"){
+    addRelativePositionPointLayerByCSV(map, filename, planeLayerId, layerId);
+  } else if(filename.split('.').pop() == "geojson") {
+    addRelativePositionPointLayerByGeoJson(map, filename, planeLayerId, layerId);
+  }
+}
+
+function updateRelativePositionPointLayer(map, filename, planeLayerId, layerId){
+  if (map.getLayer(layerId)) {
+    map.removeLayer(layerId);
+  }
+  addRelativePositionPointLayer(map, filename, planeLayerId, layerId);
+}
+
+function addRelativePositionPointLayerByGeoJson(map, filename, planeLayerId, layerId){
+  d3.json(filename).then(function(data) {
+    let planeData = map.getLayer(planeLayerId).implementation.props.data;
+    pointCloudLayer = createRelativePositionPointLayerByGeoJson(data.features, planeData, layerId);
+    map.addLayer(pointCloudLayer);
+  }).catch(function(error){
+    console.log(error);
+    console.log("error : readCsv " + filename);
+  });
+}
+
+function createRelativePositionPointLayerByGeoJson(pointData, planeData, layerId){
+  const { MapboxLayer, PointCloudLayer } = deck;
+
+  return new MapboxLayer({
+    id: layerId,
+    type: PointCloudLayer,
+    data: pointData,
+    getPosition: d => [d.geometry.coordinates[0], d.geometry.coordinates[1], 100],
+    getColor: d => convertPointColorInPlane(d.geometry.coordinates, planeData),
+    sizeUnits: 'meters',
+    pointSize: 20,
+    opacity: 1
+  });
+}
+
+function addRelativePositionPointLayerByCSV(map, filename, planeLayerId, layerId){
+  d3.csv(filename).then(function(data) {
+    let planeData = map.getLayer(planeLayerId).implementation.props.data;
+    pointCloudLayer = createRelativePositionPointLayerByCSV(data, planeData, layerId);
+    map.addLayer(pointCloudLayer);
+  }).catch(function(error){
+    console.log(error);
+    console.log("error : readCsv " + filename);
+  });
+}
+
+function createRelativePositionPointLayerByCSV(pointData, planeData, layerId){
+  const { MapboxLayer, PointCloudLayer } = deck;
+
+  return new MapboxLayer({
+    id: layerId,
+    type: PointCloudLayer,
+    data: pointData,
+    getPosition: d => [Number(d.lng), Number(d.lat), 100],
+    getColor: d => convertPointColorInPlane(d.geometry.coordinates, planeData),
+    sizeUnits: 'meters',
+    pointSize: 30,
+    opacity: 1
+  });
+}
+
+function convertPointColorInPlane(pointData, planeDataArray){
+  let defaultColor = [0, 0, 255];
+  let insideColor = [255, 0, 0];
+
+  if(!planeDataArray){
+    return defaultColor;
+  }
+
+  var pt = {
+    "type": "Feature",
+    "geometry": {
+      "type": "Point",
+      "coordinates": pointData
     }
   };
 
-  objXMLHttpRequest.send();
-}
-
-function singleCapture(pFileName) {
-  startDisplayCapture(function(pResult) {
-    if (!pResult.status) {
-      alert((pResult.error.name ? pResult.error.name + ": " : "") + (pResult.error.message ? pResult.error.message : ""));
-      return;
+  for(let planeData of planeDataArray){
+    var poly = {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": planeData.geometry.coordinates
+      }
+    };
+    if(turf.inside(pt, poly)){
+      return insideColor;
     }
-    getDisplayCapture(function(pUrl) {
-      if (pUrl) {
-        download(pUrl, pFileName, stopDisplayCapture());
-      }
-    });
-  });
+  }
+  return defaultColor;
 }
 
-function multiCapture(currentTime, startTime, endTime, stepTime, pIsContinueCallback, pPreCaptureCallback, pNameFormatCallback) {
-  if(pIsContinueCallback() && startTime.getTime() <= currentTime.getTime() && currentTime.getTime() <= endTime.getTime()){
-    startDisplayCapture(function(pResult) {
-      if (!pResult.status) {
-        alert((pResult.error.name ? pResult.error.name + ": " : "") + (pResult.error.message ? pResult.error.message : ""));
-        return;
-      }
-      getDisplayCapture(function(pUrl) {
-        if (pUrl) {
-          pPreCaptureCallback(currentTime, startTime, endTime);
-          setTimeout(function() {
-            download(pUrl, pNameFormatCallback(currentTime), 
-                     multiCapture(new Date(currentTime.getTime() + stepTime), startTime, endTime, stepTime, pIsContinueCallback, pPreCaptureCallback, pNameFormatCallback));
-          }, 2000);
-        }
-      });
-    });
-  } else {
-    stopDisplayCapture();
-  }
+
+
+function getColorCode(val, min, max){
+  var rgb = convertColor(val, min, max);
+  return "#" + rgb.map(c => ("0" + c.toString(16)).slice(-2)).join("");
+
 }
+
+function convertColor(val, min, max){
+  //var max = 100;
+  //var min = 0;
+  var dif = max - min;
+  if(                           val >  max             ) return [                            255,                                0,                               0];
+  if(val <= max              && val >= min + 0.75 * dif) return [                            255, parseInt(255 * (100 - val) / 25),                               0];
+  if(val <= min + 0.75 * dif && val >= min + 0.5  * dif) return [parseInt(255 * (val - 50) / 25),                              255,                               0];
+  if(val <= min + 0.5  * dif && val >= min + 0.25 * dif) return [                              0,                              255, parseInt(255 * (50 - val) / 25)];
+  if(val <= min + 0.25 * dif && val >= min             ) return [                              0,         parseInt(255 * val / 25),                             255];
+  if(val <  min                                        ) return [                              0,                                0,                             255];
+}
+

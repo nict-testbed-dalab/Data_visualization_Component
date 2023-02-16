@@ -3,17 +3,17 @@
   "features":[
     {
       "type":"Feature",
-      "properties":{"name":"渋谷", "direction":-31.07373255},
+      "properties":{"name":"渋谷", "direction":-31.07373255, "val_color":0, "val_size":0, "val_height":10},
       "geometry":{"type":"Point", "coordinates":[139.701334, 35.658517]}
     },
     {
       "type":"Feature",
-      "properties":{"name":"原宿", "direction":5.389352196},
+      "properties":{"name":"原宿", "direction":5.389352196, "val_color":48, "val_size":80, "val_height":90},
       "geometry":{"type":"Point", "coordinates":[139.702687, 35.670168]}
     },
     {
       "type":"Feature",
-      "properties":{"name":"代々木", "direction":-2.326924971},
+      "properties":{"name":"代々木", "direction":-2.326924971, "val_color":100, "val_size":160, "val_height":170},
       "geometry":{"type":"Point", "coordinates":[139.702042, 35.683061]}
     }
   ]

@@ -94,14 +94,21 @@ WebGISアプリ上で、主に時系列データを可視化するための機�
   方向のある3次元オブジェクトのレイヤーを追加する。
 
   * 構文 <br>
-  addMovingObjectLayer(map, filename, layerId, sourceId, color, size)
+  addMovingObjectLayer(map, file, layerId, sourceId, colorName, sizeName, heightName, colorMin, colorMax, sizeBase, sizeScale, barColor, barScale)
   * 引数
     + map Mapboxのmapオブジェクト
     + filename 3次元オブジェクトの元データとなるファイル。読み取り可能なファイルはCSVファイル(lng、lat、directionカラムは必須)、GeoJsonファイル(features.properties.directionは必須)のいずれか。
     + layerId 追加するレイヤーごとに指定するID
     + sourceId 追加するレイヤーのsourceID
-    + color 3次元グラフの色
-    + size 3次元グラフの幅（メートル）
+    + colorName 3次元オブジェクトの色を指定する数値データ（元データがCSVの場合はカラム名、GeoJsonの場合はfeatures.properties配下のキーを指定する）
+    + sizeName 3次元オブジェクト、3次元グラフのサイズを指定する数値データ（元データがCSVの場合はカラム名、GeoJsonの場合はfeatures.properties配下のキーを指定する）
+    + heightName 3次元グラフの高さを指定する数値データ（元データがCSVの場合はカラム名、GeoJsonの場合はfeatures.properties配下のキーを指定する）
+    + colorMin 3次元オブジェクトの色を指定する数値データの最小値
+    + colorMax 3次元オブジェクトの色を指定する数値データの最大値
+    + sizeBase 3次元オブジェクトのサイズの最小値
+    + sizeScale 3次元オブジェクトのサイズの増減の比率
+    + barColor 3次元グラフの色
+    + barScale 3次元グラフの高さの増減の比率
   * 戻り値 <br>
   なし
 
@@ -110,14 +117,21 @@ WebGISアプリ上で、主に時系列データを可視化するための機�
   追加した3次元オブジェクトのレイヤーを更新する。
 
   * 構文 <br>
-  updateMovingObjectLayer(map, filename, layerId, sourceId, color, size)
+  updateMovingObjectLayer(map, file, layerId, sourceId, colorName, sizeName, heightName, colorMin, colorMax, sizeBase, sizeScale, barColor, barScale)
   * 引数
     + map Mapboxのmapオブジェクト
     + filename 3次元オブジェクトの元データとなるファイル。読み取り可能なファイルはCSVファイル(lng、lat、directionカラムは必須)、GeoJsonファイル(features.properties.directionは必須)のいずれか。
     + layerId 追加したレイヤーのレイヤーID
     + sourceId 追加したレイヤーに含まれるsourceID
-    + color 3次元オブジェクトの色
-    + size 3次元オブジェクトのサイズ（メートル）
+    + colorName 3次元オブジェクトの色を指定する数値データ（元データがCSVの場合はカラム名、GeoJsonの場合はfeatures.properties配下のキーを指定する）
+    + sizeName 3次元オブジェクト、3次元グラフのサイズを指定する数値データ（元データがCSVの場合はカラム名、GeoJsonの場合はfeatures.properties配下のキーを指定する）
+    + heightName 3次元グラフの高さを指定する数値データ（元データがCSVの場合はカラム名、GeoJsonの場合はfeatures.properties配下のキーを指定する）
+    + colorMin 3次元オブジェクトの色を指定する数値データの最小値
+    + colorMax 3次元オブジェクトの色を指定する数値データの最大値
+    + sizeBase 3次元オブジェクトのサイズの最小値
+    + sizeScale 3次元オブジェクトのサイズの増減の比率
+    + barColor 3次元グラフの色
+    + barScale 3次元グラフの高さの増減の比率
   * 戻り値 <br>
   なし
 

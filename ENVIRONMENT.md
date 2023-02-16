@@ -51,7 +51,7 @@ psql
 ```
 
 #### 設定ファイルの適用とサービスの起動
-設定ファイルの編集は以下のコマンドで開始することができます。成果物一式に格納されているpg_hba.confを参考に設定を変更して下さい。
+設定ファイルの編集は以下のコマンドで開始することができます。configurationSampleに含まれる[pg_hba.conf](./configurationSample/ENVIRONMENT/pg_hba.conf)を参考に設定を変更して下さい。
 
 1. 設定ファイルを変更
 ```
@@ -119,7 +119,7 @@ sudo systemctl enable tomcat9
 sudo nano /etc/tomcat9/tomcat-users.xml
 ```
 
-成果物一式に格納されているtomcat-users.xmlを参考に設定を変更して下さい。以下の内容を追記します。
+configurationSampleに含まれる[tomcat-users.xml](./configurationSample/ENVIRONMENT/tomcat-users.xml)を参考に設定を変更して下さい。以下の内容を追記します。
 
 ```
 <role rolename="admin-gui"/>
@@ -167,7 +167,7 @@ GeoServerがデフォルトで利用するポートは8080ですが、本シス�
 sudo nano /etc/apache2/sites-enabled/default.conf
 ```
 
-成果物一式に格納されているdefault.confを参考に設定を変更して下さい。以下の内容を追記します。
+configurationSampleに含まれる[default.conf](./configurationSample/ENVIRONMENT/default.conf)を参考に設定を変更して下さい。以下の内容を追記します。
 
 ```
 ProxyPass /geoserver http://localhost:8085/geoserver
@@ -206,7 +206,7 @@ sudo keytool -genkey -alias tomcat -keyalg RSA -keystore tomcat.keystore -validi
 sudo nano /etc/apache2/sites-enabled/default.conf
 ```
 
-成果物一式に格納されているserver.xml を参考に設定を変更して下さい。以下の内容を追記します。既存の8443ポート設定がある場合はコメントアウトが必要です。
+configurationSampleに含まれる[server.xml](./configurationSample/ENVIRONMENT/server.xml)を参考に設定を変更して下さい。以下の内容を追記します。既存の8443ポート設定がある場合はコメントアウトが必要です。
 
 ```
 <Connector port="8443" protocol="org.apache.coyote.http11.Http11NioProtocol"
@@ -230,7 +230,7 @@ GeoServerの名前解決を行うため、以下の情報をGeoServerの設定�
 sudo nano /var/lib/tomcat9/webapps/geoserver/WEB-INF/web.xml
 ```
 
-成果物一式に格納されているweb.xmlを参考に設定を変更して下さい。以下の内容を追記します。
+configurationSampleに含まれる[web.xml](./configurationSample/ENVIRONMENT/web.xml)を参考に設定を変更して下さい。以下の内容を追記します。
 
 ```
 <context-param>

@@ -1,0 +1,440 @@
+{
+  "version": 3,
+  "timeout": "60s",
+  "extra_config": {
+	"security/cors": {
+		"allow_origins": ["*"],
+		"allow_methods": [],
+		"allow_headers":["Authorization"]
+           }
+  },  
+  "endpoints": [
+    {
+      "endpoint": "/api/v1/test",
+      "method" :"GET",
+      "extra_config": {
+		"auth/validator": {
+		      "alg": "RS256",
+		      "audience": ["https://tb-gis-web.jp.auth0.com/api/v2/"],
+		      "jwk_url": "https://tb-gis-web.jp.auth0.com/.well-known/jwks.json"
+		      }
+      },
+      "backend": [
+        {
+          "url_pattern": "/test/1",
+          "host": [
+            "localhost:5000"
+          ]
+
+        }
+      ]
+    },
+    {
+      "endpoint": "/api/weather/{type}/{yyyy}/{mm}/{dd}/{hh}/{mi}/{z}/{x}/{y}",
+      "method" :"GET",
+      "output_encoding": "no-op",
+      "backend": [
+        {
+          "url_pattern": "/localhimawari-data/tiles/{type}/{yyyy}/{mm}/{dd}/{hh}/{mi}/{z}/{x}/{y}",
+          "encoding": "no-op",
+          "host": [
+            "https://sc-gis.nict.go.jp"
+          ]
+
+        }
+      ]
+    },
+    {
+      "endpoint": "/api/weather_wni/{type}/{yyyymmdd}/{hhmm}/{z}/{x}/{y}",
+      "method" :"GET",
+      "output_encoding": "no-op",
+      "backend": [
+        {
+          "url_pattern": "/localhimawari-data/tiles/{type}/{yyyymmdd}/{hhmm}/{z}_{x}_{y}",
+          "encoding": "no-op",
+          "host": [
+            "https://sc-gis.nict.go.jp"
+          ]
+
+        }
+      ]
+    },
+    {
+      "endpoint": "/api/weather_h8jp/{type}/{yyyy}/{mm}/{dd}/{hh}/{mi}/{z}/{x}/{y}",
+      "method" :"GET",
+      "output_encoding": "no-op",
+      "backend": [
+        {
+          "url_pattern": "/localhimawari-data/tiles/h8jp/{type}/{yyyy}/{mm}/{dd}/{hh}/{mi}/{z}/{x}/{y}",
+          "encoding": "no-op",
+          "host": [
+            "https://sc-gis.nict.go.jp"
+          ]
+
+        }
+      ]
+    },
+    {
+      "endpoint": "/api/jp_city/{yyyymmdd}/{z}/{x}/{y}",
+      "method" :"GET",
+      "output_encoding": "no-op",
+      "backend": [
+        {
+          "url_pattern": "/city/tile/jp_city/{yyyymmdd}/{z}/{x}/{y}",
+          "encoding": "no-op",
+          "host": [
+            "https://geoshape.ex.nii.ac.jp"
+          ]
+
+        }
+      ]
+    },
+    {
+      "endpoint": "/api/vector-adm/tile/town/{z}/{x}/{y}",
+      "method" :"GET",
+      "output_encoding": "no-op",
+      "backend": [
+        {
+          "url_pattern": "/vector-adm/tile/town/{z}/{x}/{y}",
+          "encoding": "no-op",
+          "host": [
+            "https://geoshape.ex.nii.ac.jp"
+          ]
+
+        }
+      ]
+    },
+    {
+      "endpoint": "/api/weather_amjp_veda02_sshfs/{type}/{yyyy}/{mm}/{dd}/{hh}/{mi}/{z}/{x}/{y}",
+      "method" :"GET",
+      "output_encoding": "no-op",
+      "backend": [
+        {
+          "url_pattern": "/localhimawari-data/tiles/amjp/{type}/{yyyy}/{mm}/{dd}/{hh}/{mi}/{z}/{x}/{y}",
+          "encoding": "no-op",
+          "host": [
+            "https://sc-gis.nict.go.jp"
+          ]
+
+        }
+      ]
+    },
+    {
+      "endpoint": "/api/weatherrmap/{z}/{x}/{y}",
+      "method" :"GET",
+      "output_encoding": "no-op",
+      "backend": [
+        {
+          "url_pattern": "/localhimawari-data/chiba-u/damm/{z}/{x}/{y}",
+          "encoding": "no-op",
+          "host": [
+            "https://sc-gis.nict.go.jp"
+          ]
+
+        }
+      ]
+    },
+    {
+      "endpoint": "/api/std/experimental_bvmap/{z}/{x}/{y}",
+      "method" :"GET",
+      "output_encoding": "no-op",
+      "backend": [
+        {
+          "url_pattern": "/xyz/experimental_bvmap/{z}/{x}/{y}",
+          "encoding": "no-op",
+          "host": [
+            "https://cyberjapandata.gsi.go.jp"
+          ]
+
+        }
+      ]
+    },
+    {
+      "endpoint": "/api/osmr/styles/osm-bright-ja/{z}/{x}/{y}",
+      "method" :"GET",
+      "output_encoding": "no-op",
+      "backend": [
+        {
+          "url_pattern": "/styles/osm-bright-ja/{z}/{x}/{y}",
+          "encoding": "no-op",
+          "host": [
+            "https://tile.openstreetmap.jp"
+          ]
+
+        }
+      ]
+    },
+    {
+      "endpoint": "/api/osmv/data/japan/{z}/{x}/{y}",
+      "method" :"GET",
+      "output_encoding": "no-op",
+      "backend": [
+        {
+          "url_pattern": "/data/planet/{z}/{x}/{y}",
+          "encoding": "no-op",
+          "host": [
+            "https://tile.openstreetmap.jp"
+          ]
+
+        }
+      ]
+    },
+    {
+      "endpoint": "/api/pale/{z}/{x}/{y}",
+      "method" :"GET",
+      "output_encoding": "no-op",
+      "backend": [
+        {
+          "url_pattern": "/storage/data/rastertile/pale/{z}/{x}/{y}",
+          "encoding": "no-op",
+          "host": [
+            "https://tb-gis-web.jgn-x.jp"
+          ]
+
+        }
+      ]
+    },
+    {
+      "endpoint": "/api/photo/{z}/{x}/{y}",
+      "method" :"GET",
+      "output_encoding": "no-op",
+      "backend": [
+        {
+          "url_pattern": "/storage/data/rastertile/photo/{z}/{x}/{y}",
+          "encoding": "no-op",
+          "host": [
+            "https://tb-gis-web.jgn-x.jp"
+          ]
+
+        }
+      ]
+    },
+    {
+      "endpoint": "/api/std/{z}/{x}/{y}",
+      "method" :"GET",
+      "output_encoding": "no-op",
+      "backend": [
+        {
+          "url_pattern": "/storage/data/rastertile/std/{z}/{x}/{y}",
+          "encoding": "no-op",
+          "host": [
+            "https://tb-gis-web.jgn-x.jp"
+          ]
+
+        }
+      ]
+    },
+    {
+      "endpoint": "/api/data2/{type}/{id}/{z}/{x}/{y}",
+      "output_encoding": "no-op",
+      "extra_config": {
+		"auth/validator": {
+		      "alg": "RS256",
+		      "audience": ["https://tb-gis-web.jp.auth0.com/api/v2/"],
+		      "jwk_url": "https://tb-gis-web.jp.auth0.com/.well-known/jwks.json"
+		      }
+      },
+      "backend": [
+        {
+          "url_pattern": "/storage/data/{type}/{id}/{z}/{x}/{y}",
+          "encoding": "no-op",
+          "host": [
+            "https://tb-gis-web.jgn-x.jp"
+          ]
+
+        }
+      ]
+    },
+    {
+      "endpoint": "/api/data/{type}/{id}/{year}/{z}/{x}/{y}",
+      "output_encoding": "no-op",
+      "extra_config": {
+                "auth/validator": {
+                      "alg": "RS256",
+                      "audience": ["https://tb-gis-web.jp.auth0.com/api/v2/"],
+                      "jwk_url": "https://tb-gis-web.jp.auth0.com/.well-known/jwks.json"
+                      }
+      },
+      "backend": [
+        {
+          "url_pattern": "/storage/data/{type}/{id}/{year}/{z}/{x}/{y}",
+          "encoding": "no-op",
+          "host": [
+            "https://tb-gis-web.jgn-x.jp"
+          ]
+
+        }
+      ]
+    },
+    {
+      "endpoint": "/api/PLATEAU/{city}/mvt/{z}/{x}/{y}",
+      "output_encoding": "no-op",
+      "extra_config": {
+                "auth/validator": {
+                      "alg": "RS256",
+                      "audience": ["https://tb-gis-web.jp.auth0.com/api/v2/"],
+                      "jwk_url": "https://tb-gis-web.jp.auth0.com/.well-known/jwks.json"
+                      }
+      },
+      "backend": [
+        {
+          "url_pattern": "/storage/data/PLATEAU/{city}/mvt/{z}/{x}/{y}",
+          "encoding": "no-op",
+          "host": [
+            "https://tb-gis-web.jgn-x.jp"
+          ]
+
+        }
+      ]
+    },
+    {
+      "endpoint": "/api/geoserver/gwc/service/{z}/{x}/{y}",
+      "method" :"GET",
+      "output_encoding": "no-op",
+      "backend": [
+        {
+          "url_pattern": "/geoserver/gwc/service/wmts?REQUEST=GetTile&SERVICE=WMTS&VERSION=1.0.0&LAYER=japan:japan_all_v2&STYLE=&TILEMATRIX=EPSG:900913:{z}&TILEMATRIXSET=EPSG:900913&FORMAT=image/png&TILECOL={x}&TILEROW={y}",
+          "encoding": "no-op",
+          "host": [
+            "localhost:8085"
+          ]
+
+        }
+      ]
+    },
+    {
+      "endpoint": "/api/t_people_flow_base_data",
+      "method" :"GET",
+      "output_encoding": "json",
+      "backend": [
+        {
+	  "is_collection": true,
+          "url_pattern": "/test/1",
+          "host": [
+            "localhost:5000"
+          ]
+
+        }
+      ]
+    },
+    {
+      "endpoint": "/api/t_people_exist_date",
+      "method" :"GET",
+      "input_query_strings":[
+	      "*"
+      ],
+      "output_encoding": "json",
+      "backend": [
+        {
+          "url_pattern": "/peopleExistDate",
+          "host": [
+            "localhost:5000"
+          ]
+
+        }
+      ]
+    },
+    {
+      "endpoint": "/api/t_people_flow_data",
+      "method" :"GET",
+      "input_query_strings":[
+	      "*"
+      ],
+      "output_encoding": "json",
+      "backend": [
+        {
+          "url_pattern": "/peopleFlowData",
+          "host": [
+            "localhost:5000"
+          ]
+
+        }
+      ]
+    },
+    {
+      "endpoint": "/api/t_amedas_data",
+      "method" :"GET",
+      "input_query_strings":[
+              "*"
+      ],
+      "output_encoding": "json",
+      "backend": [
+        {
+          "url_pattern": "/amedasData",
+          "host": [
+            "localhost:5000"
+          ]
+
+        }
+      ]
+    },
+    {
+      "endpoint": "/api/t_tile_meta_data",
+      "method" :"GET",
+      "input_query_strings":[
+              "*"
+      ],
+      "output_encoding": "json",
+      "backend": [
+        {
+          "url_pattern": "/tileMetaData",
+          "host": [
+            "localhost:5000"
+          ]
+
+        }
+      ]
+    },
+    {
+      "endpoint": "/api/t_preprocessing_amedas_data",
+      "method" :"GET",
+      "input_query_strings":[
+              "*"
+      ],
+      "output_encoding": "json",
+      "backend": [
+        {
+          "url_pattern": "/preprocessing_amedasData",
+          "host": [
+            "localhost:5000"
+          ]
+
+        }
+      ]
+    },
+    {
+      "endpoint": "/api/t_preprocessing_garbagetruck_data",
+      "method" :"GET",
+      "input_query_strings":[
+              "*"
+      ],
+      "output_encoding": "json",
+      "backend": [
+        {
+          "url_pattern": "/garbagetruckData",
+          "host": [
+            "localhost:5000"
+          ]
+
+        }
+      ]
+    },
+    {
+      "endpoint": "/api/t_bus_location_data",
+      "method" :"GET",
+      "input_query_strings":[
+              "*"
+      ],
+      "output_encoding": "json",
+      "backend": [
+        {
+          "url_pattern": "/busLocation",
+          "host": [
+            "localhost:5000"
+          ]
+
+        }
+      ]
+    }  ],
+  "port": 8081
+}

@@ -142,7 +142,7 @@ UUID="89e901b8-23cb-40f1-978d-c633390432cb"  /storage  ext4  defaults  0  0
 本システムでは、データベース(RDBMS)としてPostgreSQLを利用し、PostgreSQLデータベースで地理空間情報を扱うための拡張であるPostGISも併せて導入します。本マニュアルでは、PostgreSQL12を使用した説明となります。
 
 #### PostgreSQL 12 のインストール
-PostgreSQLはDB兼ストレージサーバ(tb-gis-db.jgn-x.jp)へインストールします。次の2つのコマンドを実行して下さい。
+PostgreSQLはDB兼ストレージサーバ(tb-gis-db.xxx.jp)へインストールします。次の2つのコマンドを実行して下さい。
 
 1. パッケージインデックスを更新
 ```
@@ -379,7 +379,7 @@ httpsにて警告メッセージなく表示されることを確認します。
 GeoServerはWebブラウザなどが利用する地理情報を配信するJavaアプリケーションです。ここでは、GeoServerインストールおよび併せて必要なOpenJDK、Tomcatのインストールについて説明します。
 
 #### パッケージインデックスの更新
-GeoServer及び依存パッケージはWebサーバ(tb-gis-db.jgn-x.jp)へインストールします。次のコマンドを実行して下さい。
+GeoServer及び依存パッケージはWebサーバ(tb-gis-db.xxx.jp)へインストールします。次のコマンドを実行して下さい。
 
 1. パッケージインデックスを更新
 ```
@@ -532,12 +532,12 @@ configurationSampleに含まれる[web.xml](./configurationSample/ENVIRONMENT/we
 ```
 <context-param>
   <param-name>PROXY_BASE_URL</param-name>
-  <param-value>https://tb-gis-web-dev.jgn-x.jp/geoserver</param-value>
+  <param-value>https://xxx.jp/geoserver</param-value>
 </context-param>
 
 <context-param>
   <param-name>GEOSERVER_CSRF_WHITELIST</param-name>
-  <param-value>tb-gis-web-dev.jgn-x.jp</param-value>
+  <param-value>xxx.jp</param-value>
 </context-param>
 ```
 
@@ -1189,7 +1189,7 @@ NameとネームスペースURIを設定し、送信をクリックします。N
         "mvt": {
             "type": "vector",
             "tiles": [
-                "https://tb-gis-web-dev.jgn-x.jp/storage/data/vectortile/1_a_3_2_tochi/style.json"
+                "https://xxx.jp/storage/data/vectortile/1_a_3_2_tochi/style.json"
             ]
         }
     },
@@ -1266,7 +1266,7 @@ NameとネームスペースURIを設定し、送信をクリックします。N
 
 その後、対応Webブラウザにより
 
-[https://tb-gis-web.jgn-x.jp/mapbox_template/](https://tb-gis-web.jgn-x.jp/mapbox_template/)
+`https://tb-gis-web.xxx.jp/mapbox_template`
 
 へアクセスして、図 4-1のように地理情報が表示できれば設置は成功です。表示が成功しない場合は、環境構築の状況を確認して下さい。
 もしくは、/js/の中にある各レイヤを設定している箇所を適宜修正してください。
@@ -1294,7 +1294,7 @@ npm run build
 
 その後、対応Webブラウザにより
 
-[https://tb-gis-web.jgn-x.jp/itowns_template/](https://tb-gis-web.jgn-x.jp/itowns_template/)
+`https://tb-gis-web.xxx.jp/itowns_template/`
 
 へアクセスして、図 4-2のように地理情報が表示できれば設置は成功です。表示が成功しない場合は、環境構築の状況を確認して下さい。
 もしくは、/JSONLayers/layers/の中にある各レイヤ設定ファイル（jsonファイル）の中にあるデータの参照先を適宜修正してください。

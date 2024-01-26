@@ -3,9 +3,8 @@
 ## サーバ環境構築
 本システムは以下の構成で実装しています。構成例の一つとしてご参考ください。
 
-|                |                                  |
-|----------------|----------------------------------|
-|仮想マシン名   |用途                              　 |
+|仮想マシン名   |用途                                |
+|--------------|------------------------------------|
 |tb-gis-web    |公開用Webサーバ                      |
 |tb-gis-proc   |SSHフロントサーバ兼データ収集処理サーバ|
 |tb-gis-db     |ストレージ兼DBサーバ                  |
@@ -18,7 +17,7 @@
 
 1. Ubuntuを以下からダウンロードする。
 
-[https://jp.ubuntu.com/download](https://jp.ubuntu.com/download)
+    [https://jp.ubuntu.com/download](https://jp.ubuntu.com/download)
 
 2. インストールしたUbuntuをDVDなどのメディアに書き込む。
 
@@ -26,8 +25,7 @@
 
 4. インストーラーで使用する言語の確認画面が表示される。日本語未対応のため、[English]を選択する
 
-5. すでにインターネットに接続されている場合、[Update to the new installer]を選択する。
-インターネットに接続されていない場合、[Continue without updating]を選択する。
+5. すでにインターネットに接続されている場合、[Update to the new installer]を選択する。インターネットに接続されていない場合、[Continue without updating]を選択する。
 
 6. キーボード選択画面が表示されるため[Layout]と[Variant]に[Japanese]を設定し、[Done]を選択する。
 
@@ -141,11 +139,10 @@ UUID="89e901b8-23cb-40f1-978d-c633390432cb"  /storage  ext4  defaults  0  0
 
 ### データベース
 #### 本システムで利用するデータベース
-本システムでは、データベース(RDBMS)としてPostgreSQLを利用し、PostgreSQLデータベースで地理空間情報を扱うための拡張であるPostGISも併せて導入します。
-本マニュアルでは、PostgreSQL12を使用した説明となります。
+本システムでは、データベース(RDBMS)としてPostgreSQLを利用し、PostgreSQLデータベースで地理空間情報を扱うための拡張であるPostGISも併せて導入します。本マニュアルでは、PostgreSQL12を使用した説明となります。
 
 #### PostgreSQL 12 のインストール
-PostgreSQL はDB兼ストレージサーバ(tb-gis-db.jgn-x.jp)へインストールします。次の2つのコマンドを実行して下さい。
+PostgreSQLはDB兼ストレージサーバ(tb-gis-db.jgn-x.jp)へインストールします。次の2つのコマンドを実行して下さい。
 
 1. パッケージインデックスを更新
 ```
@@ -162,7 +159,7 @@ sudo apt -y install postgresql-12 postgresql-client-12 postgresql-client-common 
 PostgreSQL本体、及び必要な関連パッケージをインストールします。このコマンドでPostGIS(“… postgresql-12-postgis-3 …” と記述してある部分が該当箇所)も同時にインストールします。
 
 #### パスワードの設定
-PostgreSQLのインストール時に作成されるpostgresユーザにパスワードを設定します。次のコマンドを入力し、パスワードを設定して下さい。以降ではここで設定するパスワードを” postgres”として記述します。実際のパスワードはセキュリティ確保のため、適切な強度を持ったものを設定して下さい。
+PostgreSQLのインストール時に作成されるpostgresユーザにパスワードを設定します。次のコマンドを入力し、パスワードを設定して下さい。以降ではここで設定するパスワードを”postgres”として記述します。実際のパスワードはセキュリティ確保のため、適切な強度を持ったものを設定して下さい。
 
 1. パスワードの設定
 ```
@@ -195,15 +192,14 @@ ALTER ROLE postgres WITH PASSWORD 'postgres';
 ```
 
 #### 設定ファイルの適用とサービスの起動
-設定ファイルの編集は以下のコマンドで開始することができます。configurationSampleに含まれる[pg_hba.conf](./configurationSample/ENVIRONMENT/pg_hba.conf)を参考に設定を変更して下さい。
-また、本マニュアルでは、nanoエディタを使用し設定ファイルを編集しています。
+設定ファイルの編集は以下のコマンドで開始することができます。configurationSampleに含まれる[pg_hba.conf](./configurationSample/ENVIRONMENT/pg_hba.conf)を参考に設定を変更して下さい。また、本マニュアルでは、nanoエディタを使用し設定ファイルを編集しています。
 
 1. 設定ファイルを変更
 ```
 sudo nano /etc/postgresql/12/main/pg_hba.conf
 ```
 
-サービスの登録、起動、再起動、停止は以下のそれぞれのコマンドで行うことができます。上の設定ファイル変更を適用するため、サービスを再起動して下さい。再起動後、改めて2.5.4の手順でPostgreSQLへの接続を確認できれば、データベースの構築は完了です。
+サービスの登録、起動、再起動、停止は以下のそれぞれのコマンドで行うことができます。上の設定ファイル変更を適用するため、サービスを再起動して下さい。再起動後、改めて[こちら](#psqlを使ったpostgresqlへの接続)の手順でPostgreSQLへの接続を確認できれば、データベースの構築は完了です。
 
 1. 登録
 ```
@@ -226,8 +222,7 @@ sudo systemctl postgresql stop
 ```
 
 #### PL/Pythonの導入
-PostgreSQL上で動作するPython実装のユーザ独自定義関数を開発、実行するために、以下を実施しPL/Pythonを導入します。
-本マニュアルでは、PL/Pythonを導入するにあたり、pip3をインストール必要があります。pip3がインストールされていない場合は、5.3.1 pip3（インストールされていない場合のみ）を参照してください。
+PostgreSQL上で動作するPython実装のユーザ独自定義関数を開発、実行するために、以下を実施しPL/Pythonを導入します。本マニュアルでは、PL/Pythonを導入するにあたり、pip3をインストール必要があります。pip3がインストールされていない場合は、[こちら](#pip3のインストール（インストールされていない場合のみ）)を参照してください。
 
 1. ユーザ切り替え
 ```
@@ -256,6 +251,7 @@ lanname
 ```
 
 5. pythonライブラリの追加
+
 ユーザ独自定義関数内でPythonライブラリを利用する場合は、以下でインストールします。
 ```
 $ sudo pip3 install [利用ライブラリ]
@@ -290,11 +286,12 @@ sudo systemctl status apache2
 ![](media/ENVIRONMENT/image24.png)
 
 5. ブラウザから確認します。
-ブラウザにWEBサーバのIPアドレスを入力し、下記のようなApache2の初期画面が表示されていればインストールできています(図 30)。
+
+ブラウザにWEBサーバのIPアドレスを入力し、下記のようなApache2の初期画面が表示されていればインストールできています(図 2-1)。
 
 ![](media/ENVIRONMENT/image25.png)
 
-図 30 Apache2の初期画面
+図 2-1 Apache2の初期画面
 
 #### 各ミドルウェアへのリバースプロキシ設定
 1. 下記コマンドを実行してプロキシを有効にします。
@@ -437,8 +434,7 @@ sudo systemctl restart tomcat9
 ```
 
 #### GeoServerのインストール
-以下の4つのコマンドを実行し、GeoServerのインストールを行います。
-また、本マニュアルでは、GeoServer2.20.1を使用した説明となります。
+以下の4つのコマンドを実行し、GeoServerのインストールを行います。また、本マニュアルでは、GeoServer2.20.1を使用した説明となります。
 
 1. GeoServerパッケージ(ZIPファイル)の取得
 ```
@@ -461,8 +457,7 @@ sudo unzip geoserver-2.20.1-war.zip
 ```
 
 #### GeoServerのポート設定(Apacheの設定変更)
-GeoServerがデフォルトで利用するポートは8080ですが、本システムでは8085を使用します。Apacheの設定ファイル(/etc/apache2/sites-enabled/default.conf)を編集します。
-設定ファイルの編集は以下のコマンドで開始することができます。
+GeoServerがデフォルトで利用するポートは8080ですが、本システムでは8085を使用します。Apacheの設定ファイル(/etc/apache2/sites-enabled/default.conf)を編集します。設定ファイルの編集は以下のコマンドで開始することができます。
 
 1. 設定ファイルを変更
 ```
@@ -476,7 +471,7 @@ ProxyPass /geoserver http://localhost:8085/geoserver
 ProxyPassReverse /geoserver http://localhost:8085/geoserver
 ```
 
-ここまでの設定を反映するため、一度Tomcat 、Apacheを再起動します。以下の2つのコマンドを実行して下さい。
+ここまでの設定を反映するため、一度Tomcat、Apacheを再起動します。以下の2つのコマンドを実行して下さい。
 
 1. Tomcatの再起動
 ```
@@ -493,7 +488,7 @@ SSL対応(https対応)を行うため、証明書の作成と設定を行いま�
 
 1. Tomcatの設定ディレクトリへ移動
 ```
-cd  /var/lib/tomcat9/conf
+cd /var/lib/tomcat9/conf
 ```
 
 2. 証明書の作成
@@ -553,7 +548,7 @@ configurationSampleに含まれる[web.xml](./configurationSample/ENVIRONMENT/we
 sudo systemctl restart tomcat9
 ```
 
-以下のコマンドを実行して正常なレスポンスが返れば、構築は成功です。Webブラウザから [https://localhost:8443/](https://localhost:8443/) へアクセスして、GeoServerの管理を行うことができます(図 31、図 32)。
+以下のコマンドを実行して正常なレスポンスが返れば、構築は成功です。Webブラウザから [https://localhost:8443/](https://localhost:8443/) へアクセスして、GeoServerの管理を行うことができます(図 2-1、図 2-2)。
 Geoserverはデフォルトではユーザ名：admin、パスワード：geoserverとなっているため、適切な強度を持ったものを設定して下さい。
 
 1. GeoServer管理インターフェースへのアクセス
@@ -563,16 +558,17 @@ curl -k https://localhost:8443/
 
 ![](media/ENVIRONMENT/image1.png)
 
-図 31 GeoServerの管理インターフェース(ログイン前)
+図 2-1 GeoServerの管理インターフェース(ログイン前)
 
 ![](media/ENVIRONMENT/image2.png)
 
-図 32 GeoServerの管理インターフェース(ログイン後)
+図 2-2 GeoServerの管理インターフェース(ログイン後)
 
 
 ### KrakenD
 #### インストール
 作業ディレクトリはログインユーザのディレクトリとします。
+
 下記コマンドを実行します。
 
 （１，２行目：krakendのキーの登録、３行目：パッケージリストの更新）
@@ -583,6 +579,7 @@ sudo apt-get update
 sudo apt-get install -y krakend
 ```
 インストールすると、下記のようなメッセージが表示されます。
+
 ![](media/ENVIRONMENT/image27.png)
 
 #### ディレクトリ作成
@@ -603,7 +600,7 @@ https://tb-gis-web.jgn-x.jp
 WebAPIは5000番ポート、GeoServerは8085番ポートで起動していない場合は下記記述のポート番号を変更してください。
 ```
 localhost:5000 
-localhost:8085　
+localhost:8085
 ```
 
 #### KrakenDの認証設定
@@ -636,7 +633,7 @@ ps aux | grep krakend
 （プロセスIDは起動ごとに異なります。）
 
 ```
-kill 123456
+kill 20496
 ```
 
 ### FastAPI
@@ -648,7 +645,9 @@ sudo apt install python3-pip
 ```
 
 2. 確認メッセージでは「Y」を入力します。
+
 下記のような実行結果が表示されます。
+
 ![](media/ENVIRONMENT/image29.png)
 
 #### 各種フレームワーク
@@ -748,9 +747,8 @@ npm --version
 データ取得変換ツールは、表 1の2つの個別ツールで構成されます。
 
 表 1　個別ツール一覧
-|                            |                                                                          |
-|----------------------------|--------------------------------------------------------------------------|
 |個別ツール名                |用途                                                                      |
+|----------------------------|--------------------------------------------------------------------------|
 |地理空間情報データ変換ツール|国土数値情報(シェープファイル)のバイナリベクトルタイル形式への変換        |
 |3次元建物データ変換ツール   |国土交通省PLATEAUによる3次元建物データのバイナリベクトルタイル形式への変換|
 
@@ -760,6 +758,7 @@ npm --version
 ### データ取得変換ツール依存パッケージのインストール
 #### unzipのインストール手順
 データ取得変換ツールに必要なunzipのインストールについて記述します。
+
 次のコマンドを実行して下さい。
 
 1. unzipインストール
@@ -770,6 +769,7 @@ sudo apt install unzip
 #### gdalのインストール手順
 データ取得変換ツールに必要なgdalのインストールについて記述します。
 本マニュアルでは、gdal 3.4.0を使用した説明となります。
+
 次のコマンドを実行して下さい。
 
 1. gdalインストール
@@ -880,9 +880,8 @@ ruby tdlmn.rb -mn -dt -merge
 本システムに標準で収集、公開されているデータは、表 2のとおりです。program.iniのTILE_ID、ZOOM_LEVEL、TILE_FOLDERを都度変更してコマンドを実行し、タイルをダウンロードして下さい。
 
 表 2　使用タイル一覧
-|                |                  |                                    |                                                  |
-|----------------|------------------|------------------------------------|--------------------------------------------------|
 |タイル名        |TILE_ID           |ZOOM_LEVEL                          |TILE_FOLDERについて                               |
+|----------------|------------------|------------------------------------|--------------------------------------------------|
 |航空写真        |seamlessphoto     |2,3,4,5,6,7,8,9,10,11,12,13,14,15,16|任意の作業ディレクトリを指定して実行し、ファイルを保存|
 |淡色地図        |pale              |5,6,7,8,9,10,11,12,13,14,15,16,17,18|任意の作業ディレクトリを指定して実行し、ファイルを保存|
 |標準地図        |std               |5,6,7,8,9,10,11,12,13,14,15,16      |任意の作業ディレクトリを指定して実行し、ファイルを保存|
@@ -898,12 +897,14 @@ ruby tdlmn.rb -mn -dt -merge
 [https://www.mlit.go.jp/plateau/](https://www.mlit.go.jp/plateau/)
 
 (3D都市モデル（Project PLATEAU）ポータルサイト)
+
 [https://www.geospatial.jp/ckan/dataset/plateau](https://www.geospatial.jp/ckan/dataset/plateau)
 
 により整備、公開されているMVT 形式の3D都市モデルを表示することが可能です。また、CityGMLとしてしか公開されていないものについても、収集時にQIGSでGeoJSONファイルに変換して保存することにより、データ取得変換ツールでGeoJSON からMVT形式に変換して利用することができます。以降では、この方法について記述します。CityGMLがzipファイルに圧縮されている場合は、「地理空間情報データ変換ツールの利用」の手順で展開して下さい。
 
 
 1. QGISのバージョン確認
+
 QGISは3.16以降、かつQGISに同梱のGDALのバージョンは3.4以降で利用して下さい。JVN上(CUI)でのQGIS操作となるため、QGISが利用できるPythonコンソールで作業します。以下の説明で、日本語込みの[](例：[レイヤ名])はPython配列ではなく、コマンド実行時に置き換える箇所を示します。
 
 (参考)
@@ -920,6 +921,7 @@ sudo apt install qgis
 
 
 2. QGIS (Pythonコンソールから使用)の起動
+
 次のコマンドを順に実行して、QGIS を起動して下さい。はじめに、Processingを利用できるよう設定します。
 
 ```
@@ -940,6 +942,7 @@ Processing.initialize()
 ```
 
 3. CityGMLの読み込み
+
 次のコマンドを実行して、CityGMLをQGISのレイヤとして読み込んで下さい。
 
 ```
@@ -950,6 +953,7 @@ Processing.initialize()
 
 
 4. GeoJSONの保存設定
+
 次のコマンドを実行して、CityGMLをQGISのレイヤとして読み込んで下さい。
 
 ```
@@ -968,6 +972,7 @@ params = {
 ```
 
 5. GeoJSONの保存
+
 次のコマンドを実行して、GeoJSONファイルを保存して下さい。
 ```
 processing.run('native:mergevectorlayers', params)
@@ -977,6 +982,7 @@ processing.run('native:mergevectorlayers', params)
 
 
 6. QGIS (Pythonコンソールから使用)の終了
+
 次のコマンドを実行して、QGIS (Pythonコンソールから使用)を終了して下さい。
 ```
 exit()
@@ -1011,6 +1017,7 @@ data_preparation_tool_mvt.sh [MVTを出力したいフォルダ名のパス] [�
 です。
 
 (参考) 直接tippecanoeを実行する場合
+
 tippecanoeでGeoJSON形式のデータをMVTに変換します。
 
 ```
@@ -1056,40 +1063,40 @@ tippecanoe -pC -ad -an -ps -z[作成したい最大のズームレベル] -e [MV
 
 ### GeoServerへのGeoTiffの登録
 #### ワークスペースの準備
-本システムで利用するワークスペースが未作成の場合は、予めワークスペースの作成を行います(図 41)。
+本システムで利用するワークスペースが未作成の場合は、予めワークスペースの作成を行います(図 3-1)。
 
 ![](media/ENVIRONMENT/image3.png)
 
-図 4-1　ワークスペース作成
+図 3-1　ワークスペース作成
 
 サイドメニューの「ワークスペース」から、「新規ワークスペース追加」でも同様にワークスペースを作成できます。
 
-NameとネームスペースURIを設定し、送信をクリックします。NAMEとネームスペースURIは自由に設定してください(図 42)。
+NameとネームスペースURIを設定し、送信をクリックします。NAMEとネームスペースURIは自由に設定してください(図 3-2)。
 
 ![](media/ENVIRONMENT/image4.png)
 
-図 4-2　ワークスペース作成(入力)
+図 3-2　ワークスペース作成(入力)
 
 サイドメニューの「ワークスペース」をクリックすると、ワークスペースの一覧が表示されるので、先ほど作成したワークスペースをクリックしてください。
-ワークスペース編集のページに遷移するので、「WMTS」にチェックをつけて保存してください(図 43)。
+ワークスペース編集のページに遷移するので、「WMTS」にチェックをつけて保存してください(図 3-3)。
 
 ![](media/ENVIRONMENT/image5.png)
 
-図 4-3　ワークスペース作成(設定)
+図 3-3　ワークスペース作成(設定)
 
 
 ##### GeoTiffデータの登録
 サイドメニューの「ストア」をクリックし、「ストア新規追加」をクリックしてください。
 ![](media/ENVIRONMENT/image6.png)
 
-図 4-4　ワークスペース作成(設定)
+図 3-4　ワークスペース作成(設定)
 
 
 新規データソースのページに遷移するので、ラスターデータソースに内にある「GeoTIFF」をクリックします。
 
 ![](media/ENVIRONMENT/image7.png)
 
-図 4-5　ワークスペース作成(設定)
+図 3-5　ワークスペース作成(設定)
 
 
 「GeoTIFF」をクリックすると、ラスターデータの追加のページに遷移します。「ワークスペース」を事前に作成したものを選択し、「データソース名」は任意に設定してください。「URL」には、tifデータが置いてあるディレクトリを指定し、保存してください。
@@ -1098,21 +1105,21 @@ NameとネームスペースURIを設定し、送信をクリックします。N
 
 ![](media/ENVIRONMENT/image8.png)
 
-図 4-6　ワークスペース作成(設定)
+図 3-6　ワークスペース作成(設定)
 
 
 保存をクリックすると、新規レイヤの画面に遷移するので、「公開」をクリックしてください。
 
 ![](media/ENVIRONMENT/image9.png)
 
-図 4-7　ワークスペース作成(設定)
+図 3-7　ワークスペース作成(設定)
 
 
 「公開」をクリックすると、レイヤ編集ページに移動します。設定を変更せずに画面下の「保存」をクリックしてください。
 
 ![](media/ENVIRONMENT/image10.png)
 
-図 4-8　ワークスペース作成(設定)
+図 3-8　ワークスペース作成(設定)
 
 
 サイドメニューの「レイヤ」に移動すると、先ほど作成したレイヤが追加されています。
@@ -1121,7 +1128,7 @@ NameとネームスペースURIを設定し、送信をクリックします。N
 
 ![](media/ENVIRONMENT/image11.png)
 
-図 4-9　ワークスペース作成(設定)
+図 3-9　ワークスペース作成(設定)
 
 
 
@@ -1130,27 +1137,27 @@ NameとネームスペースURIを設定し、送信をクリックします。N
 
 ![](media/ENVIRONMENT/image12.png)
 
-図 4-10　ワークスペース作成(設定)
+図 3-10　ワークスペース作成(設定)
 
 
 「レイヤグループの新規追加」をクリックすると、レイヤグループの画面に遷移するので、「ユーザ名」と「タイトル名」を任意で設定し、「ワークスペース」を先ほど作成したものを選択します。
 ![](media/ENVIRONMENT/image13.png)
 
-図 4-11　ワークスペース作成(設定)
+図 3-11　ワークスペース作成(設定)
 
 
 「レイヤ追加」をクリックすると、ポップアップが表示されるので、追加したレイヤを全て選択してください。
 
 ![](media/ENVIRONMENT/image14.png)
 
-図 4-12　ワークスペース作成(設定)
+図 3-12　ワークスペース作成(設定)
 
 
 「短径を生成」をクリックすると、追加されたレイヤの範囲を自動で読み取り、最小Xなどの項目にバウンディングボックスが生成されるので、一番下の保存をクリックし、設定を保存します。
 
 ![](media/ENVIRONMENT/image15.png)
 
-図 4-13　ワークスペース作成(設定)
+図 3-13　ワークスペース作成(設定)
 
 
 設定が完了したら、サイドメニューの「レイヤグループ」のレイヤグループ一覧に先ほどグループ化したレイヤがあるか確認します。
@@ -1158,7 +1165,7 @@ NameとネームスペースURIを設定し、送信をクリックします。N
 確認後、サイドメニューの「レイヤプレビュー」からグループ化したレイヤの「OpenLayers」をクリックすると、以下のように追加したレイヤがWMTSで配信されているのが確認できます。
 ![](media/ENVIRONMENT/image16.png)
 
-図 4-14　ワークスペース作成(設定)
+図 3-14　ワークスペース作成(設定)
 
 
 
@@ -1261,17 +1268,17 @@ NameとネームスペースURIを設定し、送信をクリックします。N
 
 [https://tb-gis-web.jgn-x.jp/mapbox_template/](https://tb-gis-web.jgn-x.jp/mapbox_template/)
 
-へアクセスして、図 5-1のように地理情報が表示できれば設置は成功です。表示が成功しない場合は、環境構築の状況を確認して下さい。
+へアクセスして、図 4-1のように地理情報が表示できれば設置は成功です。表示が成功しない場合は、環境構築の状況を確認して下さい。
 もしくは、/js/の中にある各レイヤを設定している箇所を適宜修正してください。
 
 ![](media/ENVIRONMENT/image21.png)
 
-図 5-1　テンプレートアプリケーションの初期画面(Mapbox)
+図 4-1　テンプレートアプリケーションの初期画面(Mapbox)
 
 
 ### iTowns
 #### テンプレートアプリケーションの設置
-[TemplateWebGIS_iTowns](https://github.com/nict-testbed-dalab/TemplateWebGIS_iTowns)からJSONLayers、 data、font、jquery-k2go-timeline、projectNict、src、auth_config.json、index.html、package-lock.json、package.json、webpack.config.jsを取得し、
+[TemplateWebGIS_iTowns](https://github.com/nict-testbed-dalab/TemplateWebGIS_iTowns)からJSONLayers、data、font、jquery-k2go-timeline、projectNict、src、auth_config.json、index.html、package-lock.json、package.json、webpack.config.jsを取得し、
 
 /var/www/html/itowns_template
 
@@ -1289,12 +1296,12 @@ npm run build
 
 [https://tb-gis-web.jgn-x.jp/itowns_template/](https://tb-gis-web.jgn-x.jp/itowns_template/)
 
-へアクセスして、図 5-2のように地理情報が表示できれば設置は成功です。表示が成功しない場合は、環境構築の状況を確認して下さい。
+へアクセスして、図 4-2のように地理情報が表示できれば設置は成功です。表示が成功しない場合は、環境構築の状況を確認して下さい。
 もしくは、/JSONLayers/layers/の中にある各レイヤ設定ファイル（jsonファイル）の中にあるデータの参照先を適宜修正してください。
 
 ![](media/ENVIRONMENT/image35.png)
 
-図 5-2　テンプレートアプリケーションの初期画面
+図 4-2　テンプレートアプリケーションの初期画面
 
 #### (参考)iTownsのビルド環境も併せて構築する場合
 テンプレートアプリケーションやサンプルアプリケーションを参考に独自のアプリケーションを開発する際、ベースとなっているiTownsのビルド環境も併せて構築すると、iTownsの公式サンプルによる学習を行いながら開発を進めることができます。
